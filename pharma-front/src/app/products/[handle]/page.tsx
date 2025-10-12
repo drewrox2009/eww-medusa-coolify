@@ -117,8 +117,10 @@ export default async function ProductDetailPage({
             <div className="mb-6 pb-6 border-b border-gray-200">
               <p className="text-sm text-gray-500 mb-1">Starting at</p>
               <p className="text-3xl font-bold text-gray-900">
-                {product.variants?.[0]?.prices?.[0]?.amount
-                  ? formatPrice(product.variants[0].prices[0].amount)
+                {product.variants?.[0]?.calculated_price?.calculated_amount
+                  ? formatPrice(
+                      product.variants[0].calculated_price.calculated_amount
+                    )
                   : "Price unavailable"}
               </p>
             </div>
