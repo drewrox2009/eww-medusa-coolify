@@ -111,6 +111,7 @@ Here are a few things to keep in mind when working with this setup:
   To run Medusa CLI commands inside the `medusa-server`, open the Terminal tab and run:  
   ```bash
   node_modules/.bin/medusa <command>
+  node_modules/.bin/medusa user --email admin@example.com --password secure_password
   ```
 
 - 📦 **Database Migrations**  
