@@ -18,7 +18,7 @@ export default function CartPage() {
       if (cartId) {
         try {
           const cartData = await getCart(cartId);
-          setCart(cartData.cart);
+          setCart(cartData);
         } catch (error) {
           console.error("Failed to load cart:", error);
         }
@@ -40,7 +40,7 @@ export default function CartPage() {
     );
   }
 
-  const isEmpty = !cart || !cart.items || cart.items.length === 0;
+  const isEmpty = !cart || !cart.cart?.items || cart.cart.items.length === 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,7 +108,7 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
-              {cart.items.map((item: any) => (
+              {cart.cart.items.map((item: any) => (
                 <div
                   key={item.id}
                   className="bg-white rounded-lg border border-gray-200 p-6"
@@ -206,7 +206,7 @@ export default function CartPage() {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-gray-700">
                     <span>Subtotal</span>
-                    <span>{formatPrice(cart.subtotal || 0)}</span>
+                    <span>{formatPrice(cart.cart?.subtotal || 0)}</span>
                   </div>
                   <div className="flex justify-between text-gray-700">
                     <span>Shipping</span>
@@ -216,7 +216,11 @@ export default function CartPage() {
                   </div>
                   <div className="border-t border-gray-200 pt-3 flex justify-between text-lg font-bold text-gray-900">
                     <span>Total</span>
-                    <span>{formatPrice(cart.total || cart.subtotal || 0)}</span>
+                    <span>
+                      {formatPrice(
+                        cart.cart?.total || cart.cart?.subtotal || 0
+                      )}
+                    </span>
                   </div>
                 </div>
 

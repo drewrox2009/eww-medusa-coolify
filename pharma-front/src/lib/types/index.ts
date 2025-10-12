@@ -49,7 +49,7 @@ export interface CartItem {
   quantity: number;
   unit_price: number;
   subtotal: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Cart {
@@ -60,7 +60,7 @@ export interface Cart {
   total: number;
   created_at: string;
   updated_at: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Customer {
@@ -70,7 +70,7 @@ export interface Customer {
   last_name?: string;
   phone?: string;
   has_account: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Address {
@@ -86,7 +86,7 @@ export interface Address {
   province?: string;
   postal_code?: string;
   phone?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Order {
