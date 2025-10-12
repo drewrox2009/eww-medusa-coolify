@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   postgres:
     image: postgis/postgis:16-master
@@ -24,11 +24,11 @@ services:
     volumes:
       - minio_data:/data
     ports:
-      - 9001:9000        # MinIO API
-      - 9002:9001        # MinIO Console
+      - 9001:9000 # MinIO API
+      - 9002:9001 # MinIO Console
     environment:
-      MINIO_ROOT_USER: minio
-      MINIO_ROOT_PASSWORD: minio123
+      MINIO_ROOT_USER: TJqp7imT8XoJMXnK
+      MINIO_ROOT_PASSWORD: by5r2nFwn04LJ6q4d3s29vH6HDkP3hUX
     command: server /data --console-address ":9001"
 
   pgadmin:
@@ -43,8 +43,8 @@ services:
       - pgadmin:/var/lib/pgadmin
     depends_on:
       - postgres
-  
+
 volumes:
   pgadmin:
-  minio_data: 
+  minio_data:
   database:
