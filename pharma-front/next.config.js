@@ -18,8 +18,8 @@ const nextConfig = {
       },
     ],
   },
-  // Uncomment for Docker deployment
-  // output: 'standalone',
+  // Enable for Docker deployment
+  output: "standalone",
 };
 
 module.exports = nextConfig;

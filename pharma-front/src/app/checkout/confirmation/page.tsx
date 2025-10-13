@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Package, Truck, CreditCard, Home } from "lucide-react";
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order");
@@ -82,6 +82,22 @@ export default function OrderConfirmationPage() {
           </Link>
         </div>
       </div>
+    );
+  }
+
+  function LoadingFallback() {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  export default function OrderConfirmationPage() {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <OrderConfirmationContent />
+      </Suspense>
     );
   }
 
