@@ -22,7 +22,7 @@ type ResendOptions = {
   html_templates?: Record<string, ResendHtmlTemplate>;
 };
 
-type TemplateRenderer = (data: unknown) => ReactNode;
+type TemplateRenderer = (data: Record<string, unknown>) => ReactNode;
 
 /**
  * Built-in template registry. Populate this object with React renderers or
@@ -136,10 +136,11 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
   ): CreateEmailOptions | null {
     const templateKey = notification.template as string | undefined;
     const template = templateKey ? this.getTemplate(templateKey) : null;
+    const data = (notification.data ?? {}) as Record<string, unknown>;
 
     const to = this.coerceStringArray(notification.to);
-    const cc = this.coerceStringArray(notification.data?.cc);
-    const bcc = this.coerceStringArray(notification.data?.bcc);
+    const cc = this.coerceStringArray(data.cc);
+    const bcc = this.coerceStringArray(data.bcc);
 
     if (!to.length) {
       this.logger.error("Resend notification requires a recipient (`to`).");
@@ -147,11 +148,15 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     }
 
     const subject =
-      notification.data?.subject ??
+      this.resolveString(data.subject) ??
       (templateKey ? this.getTemplateSubject(templateKey) : undefined) ??
       "Notification";
 
-    const baseOptions: CreateEmailOptions = {
+    const baseOptions: Partial<CreateEmailOptions> & {
+      from: string;
+      to: string[];
+      subject: string;
+    } = {
       from: this.options.from,
       to,
       subject,
@@ -165,49 +170,52 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
       baseOptions.bcc = bcc;
     }
 
-    if (notification.data?.reply_to || notification.data?.replyTo) {
-      baseOptions.reply_to =
-        notification.data.reply_to ?? notification.data.replyTo;
+    const replyTo = this.coerceReplyTo(data);
+    if (replyTo) {
+      baseOptions.replyTo = replyTo;
     }
 
-    if (notification.data?.attachments) {
-      baseOptions.attachments = notification.data
-        .attachments as CreateEmailOptions["attachments"];
+    const attachments = this.resolveAttachments(data.attachments);
+    if (attachments) {
+      baseOptions.attachments = attachments;
     }
 
     if (typeof template === "string") {
       return {
         ...baseOptions,
         html: template,
-      };
+      } as CreateEmailOptions;
     }
 
     if (typeof template === "function") {
       return {
         ...baseOptions,
-        react: template(notification.data),
-      };
+        react: template(data),
+      } as CreateEmailOptions;
     }
 
-    if (notification.data?.html) {
+    const html = this.resolveString(data.html);
+    if (html) {
       return {
         ...baseOptions,
-        html: notification.data.html,
-      };
+        html,
+      } as CreateEmailOptions;
     }
 
-    if (notification.data?.react) {
+    const react = this.resolveReactNode(data.react);
+    if (react) {
       return {
         ...baseOptions,
-        react: notification.data.react,
-      };
+        react,
+      } as CreateEmailOptions;
     }
 
-    if (notification.data?.text) {
+    const text = this.resolveString(data.text);
+    if (text) {
       return {
         ...baseOptions,
-        text: notification.data.text,
-      };
+        text,
+      } as CreateEmailOptions;
     }
 
     return null;
@@ -239,16 +247,54 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     }
 
     if (Array.isArray(value)) {
-      return value.filter(
-        (entry): entry is string => typeof entry === "string" && !!entry
-      );
+      return value
+        .map((entry) => this.resolveString(entry))
+        .filter((entry): entry is string => typeof entry === "string");
     }
 
-    if (typeof value === "string" && value.trim().length > 0) {
-      return [value];
+    const single = this.resolveString(value);
+    return single ? [single] : [];
+  }
+
+  private coerceReplyTo(
+    value: Record<string, unknown>
+  ): CreateEmailOptions["replyTo"] | undefined {
+    const replyTo =
+      this.resolveString(value.reply_to) ?? this.resolveString(value.replyTo);
+    const replyToList = this.coerceStringArray(value.reply_to ?? value.replyTo);
+
+    if (replyToList.length > 0) {
+      return replyToList;
     }
 
-    return [];
+    return replyTo ?? undefined;
+  }
+
+  private resolveString(value: unknown): string | undefined {
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      return trimmed.length ? trimmed : undefined;
+    }
+
+    return undefined;
+  }
+
+  private resolveReactNode(value: unknown): ReactNode | undefined {
+    if (value === undefined || value === null) {
+      return undefined;
+    }
+
+    return value as ReactNode;
+  }
+
+  private resolveAttachments(
+    value: unknown
+  ): CreateEmailOptions["attachments"] | undefined {
+    if (!Array.isArray(value)) {
+      return undefined;
+    }
+
+    return value as CreateEmailOptions["attachments"];
   }
 }
 
