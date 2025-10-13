@@ -145,7 +145,7 @@ export default function Home() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
                 href="/products"
-                className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-500 hover:shadow-primary-400/50"
+                className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 ring-1 ring-primary-400 transition hover:bg-primary-500 hover:shadow-primary-400/60"
               >
                 Shop Medications
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -319,16 +319,16 @@ export default function Home() {
       {/* CTA */}
       <section className="section-padding bg-white">
         <div className="container-custom">
-          <div className="card-surface overflow-hidden rounded-[32px] border border-primary-200 bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 p-10 text-white shadow-ambient lg:p-14">
+          <div className="card-surface overflow-hidden rounded-[32px] border border-primary-200 bg-white p-10 text-slate-900 shadow-ambient lg:p-14">
             <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-center">
               <div className="space-y-6">
-                <p className="badge-soft bg-white/20 text-white">
+                <p className="badge-soft bg-primary-100 text-primary-700">
                   Ready to begin?
                 </p>
-                <h2 className="text-3xl font-semibold text-white sm:text-4xl">
+                <h2 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
                   Start your secure treatment journey with Oceanica today
                 </h2>
-                <p className="max-w-xl text-base text-primary-100">
+                <p className="max-w-xl text-base text-slate-600">
                   Create an account to access pharmacist consultations, saved
                   prescriptions, and real-time order tracking with encrypted
                   payment options.
@@ -336,20 +336,20 @@ export default function Home() {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Link
                     href="/register"
-                    className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary-600 transition hover:bg-primary-50"
+                    className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-500 hover:shadow-primary-400/60"
                   >
                     Create account
                   </Link>
                   <Link
                     href="/products"
-                    className="inline-flex items-center justify-center rounded-full border border-white/60 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                    className="inline-flex items-center justify-center rounded-full border border-primary-200 bg-white px-6 py-3 text-sm font-semibold text-primary-600 transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700"
                   >
                     Browse catalog
                   </Link>
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/30 bg-white/10 p-8 text-sm text-primary-50">
-                <p className="font-semibold uppercase tracking-wide text-white/80">
+              <div className="rounded-3xl border border-primary-100 bg-primary-50/60 p-8 text-sm text-slate-600">
+                <p className="font-semibold uppercase tracking-wide text-primary-700">
                   Regulatory assurance
                 </p>
                 <ul className="mt-4 space-y-3">

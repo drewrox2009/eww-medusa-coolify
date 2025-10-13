@@ -87,7 +87,7 @@ export default function Header() {
             {isAuthenticated ? (
               <Link
                 href="/account"
-                className="hidden items-center gap-2 rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 lg:inline-flex"
+                className="hidden items-center gap-2 rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-500 lg:inline-flex"
               >
                 <User className="h-4 w-4" />
                 {user?.first_name || "Account"}
@@ -95,7 +95,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="hidden rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 lg:inline-flex"
+                className="hidden rounded-full border border-primary-200 bg-white px-5 py-2 text-sm font-semibold text-primary-600 shadow-sm transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 lg:inline-flex"
               >
                 Sign In
               </Link>
