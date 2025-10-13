@@ -18,7 +18,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <h1 className="text-2xl font-bold text-primary-600">
-              PharmaDirect
+              Oceanica Pharma
             </h1>
           </Link>
 

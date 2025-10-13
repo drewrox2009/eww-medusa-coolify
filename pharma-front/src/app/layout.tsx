@@ -6,7 +6,7 @@ import Header from "@/components/layout/Header";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PharmaDirect - Affordable Generic Medications",
+  title: "Oceanica Pharma - Affordable Generic Medications",
   description:
     "Trusted international pharmacy offering affordable generic medications with secure cryptocurrency payments.",
 };
@@ -18,7 +18,9 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-xl font-bold text-white mb-4">PharmaDirect</h3>
+            <h3 className="text-xl font-bold text-white mb-4">
+              Oceanica Pharma
+            </h3>
             <p className="text-sm mb-4">
               Your trusted source for affordable generic medications. We provide
               quality healthcare solutions with secure checkout and fast
@@ -112,7 +114,8 @@ function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-xs text-gray-400">
           <p>
-            &copy; {new Date().getFullYear()} PharmaDirect. All rights reserved.
+            &copy; {new Date().getFullYear()} Oceanica Pharma. All rights
+            reserved.
           </p>
           <p className="mt-2">
             This is a demonstration pharmacy website. Not for actual medical

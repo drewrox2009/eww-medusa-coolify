@@ -236,7 +236,7 @@ export default function AccountPage() {
         <div className="container-custom">
           <div className="text-center text-sm">
             <p>
-              &copy; {new Date().getFullYear()} PharmaDirect. All rights
+              &copy; {new Date().getFullYear()} Oceanica Pharma. All rights
               reserved.
             </p>
           </div>

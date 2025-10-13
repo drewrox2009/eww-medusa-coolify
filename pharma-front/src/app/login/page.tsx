@@ -39,7 +39,9 @@ export default function LoginPage() {
       {/* Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex justify-center">
-          <h1 className="text-3xl font-bold text-primary-600">PharmaDirect</h1>
+          <h1 className="text-3xl font-bold text-primary-600">
+            Oceanica Pharma
+          </h1>
         </Link>
         <h2 className="mt-6 text-center text-2xl font-bold text-gray-900">
           Sign in to your account

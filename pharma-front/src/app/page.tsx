@@ -4,89 +4,37 @@ import { ArrowRight, Shield, Truck, Lock, CreditCard } from "lucide-react";
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div className="container-custom">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-primary-600">
-                PharmaDirect
-              </Link>
-            </div>
-
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link
-                href="/products"
-                className="text-gray-700 hover:text-primary-600 transition-colors"
-              >
-                Products
-              </Link>
-              <Link
-                href="/about"
-                className="text-gray-700 hover:text-primary-600 transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/contact"
-                className="text-gray-700 hover:text-primary-600 transition-colors"
-              >
-                Contact
-              </Link>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/cart"
-                className="text-gray-700 hover:text-primary-600 transition-colors"
-              >
-                Cart (0)
-              </Link>
-              <Link
-                href="/login"
-                className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
-              >
-                Sign In
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-primary-50 to-white py-20">
-        <div className="container-custom">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Affordable Generic Medications
-            </h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Access quality prescription medications at prices you can afford.
-              Trusted international pharmacy with secure cryptocurrency
-              payments.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/products"
-                className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
-              >
-                Browse Products
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-              <Link
-                href="/about"
-                className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-primary-600 bg-white border-2 border-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
-              >
-                Learn More
-              </Link>
-            </div>
+      <section className="bg-gradient-to-b from-primary-50 to-white py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Affordable Generic Medications
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Access quality prescription medications at prices you can afford.
+            Trusted international pharmacy with secure cryptocurrency payments.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/products"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              Browse Products
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+            <Link
+              href="/about"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-primary-600 bg-white border-2 border-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
+            >
+              Learn More
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Trust Indicators */}
-      <section className="py-16 bg-white border-y border-gray-200">
-        <div className="container-custom">
+      <section className="py-16 bg-white border-y border-gray-200 px-4">
+        <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-lg mb-4">
@@ -140,8 +88,8 @@ export default function Home() {
       </section>
 
       {/* Categories */}
-      <section className="py-16 bg-gray-50">
-        <div className="container-custom">
+      <section className="py-16 bg-gray-50 px-4">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Browse by Category
@@ -178,40 +126,38 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary-600">
-        <div className="container-custom">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Ready to get started?
-            </h2>
-            <p className="text-xl text-primary-100 mb-8">
-              Create an account or browse our products today
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-primary-600 bg-white rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                Create Account
-              </Link>
-              <Link
-                href="/products"
-                className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-700 rounded-lg hover:bg-primary-800 transition-colors"
-              >
-                Browse Products
-              </Link>
-            </div>
+      <section className="py-16 bg-primary-600 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Ready to get started?
+          </h2>
+          <p className="text-xl text-primary-100 mb-8">
+            Create an account or browse our products today
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-primary-600 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Create Account
+            </Link>
+            <Link
+              href="/products"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-700 rounded-lg hover:bg-primary-800 transition-colors"
+            >
+              Browse Products
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12">
-        <div className="container-custom">
+      <footer className="bg-gray-900 text-gray-300 py-12 px-4">
+        <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <h3 className="text-white font-bold text-lg mb-4">
-                PharmaDirect
+                Oceanica Pharma
               </h3>
               <p className="text-sm">
                 Affordable generic medications with secure cryptocurrency
@@ -328,7 +274,7 @@ export default function Home() {
 
           <div className="border-t border-gray-800 pt-8 text-center text-sm">
             <p>
-              &copy; {new Date().getFullYear()} PharmaDirect. All rights
+              &copy; {new Date().getFullYear()} Oceanica Pharma. All rights
               reserved.
             </p>
           </div>
