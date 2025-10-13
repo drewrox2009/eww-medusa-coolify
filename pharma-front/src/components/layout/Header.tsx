@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ShoppingCart, User, Menu, X, Headphones } from "lucide-react";
 import { useUserStore } from "@/lib/store/user-store";
 import { useCartStore } from "@/lib/store/cart-store";
@@ -43,10 +44,19 @@ export default function Header() {
       <div className="container-custom">
         <div className="flex h-20 items-center justify-between gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-semibold text-primary-700">
-              Oceanica Pharma
-            </span>
+          <Link
+            href="/"
+            className="relative flex h-10 items-center gap-2"
+            aria-label="Oceanica Pharma homepage"
+          >
+            <Image
+              src="/oceanica-logo.png"
+              alt="Oceanica Pharma"
+              width={158}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
