@@ -52,10 +52,11 @@ export default function Header() {
             <Image
               src="/oceanica-logo.png"
               alt="Oceanica Pharma"
-              width={158}
-              height={40}
-              className="h-10 w-auto object-contain"
+              width={192}
+              height={52}
+              className="h-12 w-auto object-contain sm:h-14"
               priority
+              sizes="(min-width: 1024px) 176px, 164px"
             />
           </Link>
 
