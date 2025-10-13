@@ -1,10 +1,25 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { User, Package, CreditCard, LogOut, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  User,
+  Package,
+  CreditCard,
+  LogOut,
+  Settings,
+  ShieldCheck,
+  CalendarCheck,
+} from "lucide-react";
 import { useUserStore } from "@/lib/store/user-store";
+
+const quickLinks = [
+  { href: "/account", label: "Account Overview", icon: User },
+  { href: "/account/orders", label: "Order History", icon: Package },
+  { href: "/account/addresses", label: "Addresses", icon: Settings },
+  { href: "/account/payment", label: "Payment Methods", icon: CreditCard },
+];
 
 export default function AccountPage() {
   const router = useRouter();
@@ -16,9 +31,8 @@ export default function AccountPage() {
       return;
     }
 
-    // Load user data if needed
     loadUser();
-  }, [isAuthenticated, router, loadUser]);
+  }, [isAuthenticated, loadUser, router]);
 
   const handleLogout = async () => {
     try {
@@ -31,197 +45,194 @@ export default function AccountPage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      <div className="flex min-h-[60vh] items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <span className="h-12 w-12 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600" />
+          <p className="text-sm text-slate-500">Preparing your account…</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="container-custom">
-          <div className="py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">My Account</h1>
-                <p className="mt-1 text-sm text-gray-500">
-                  Welcome back, {user.first_name || user.email}
-                </p>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign out
-              </button>
+    <div className="bg-slate-50">
+      <section className="section-padding pt-0">
+        <div className="container-custom space-y-12">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <span className="badge-soft bg-primary-100 text-primary-800">
+                Welcome back
+              </span>
+              <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+                Account dashboard
+              </h1>
+              <p className="text-sm text-slate-600">
+                Manage your orders, secure payment preferences, and personal
+                information.
+              </p>
             </div>
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:text-primary-600"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
           </div>
-        </div>
-      </div>
 
-      <div className="container-custom py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white shadow rounded-lg p-6">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="bg-primary-100 rounded-full p-3">
-                  <User className="h-6 w-6 text-primary-600" />
-                </div>
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,0.33fr)_minmax(0,1fr)]">
+            <aside className="card-surface h-full space-y-6 p-6">
+              <div className="flex items-center gap-4">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-500/10 text-primary-600">
+                  <User className="h-6 w-6" />
+                </span>
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <p className="text-base font-semibold text-slate-900">
                     {user.first_name} {user.last_name}
-                  </h3>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+                  </p>
+                  <p className="text-sm text-slate-500">{user.email}</p>
                   {user.phone && (
-                    <p className="text-sm text-gray-500">{user.phone}</p>
+                    <p className="text-xs text-slate-500">{user.phone}</p>
                   )}
                 </div>
               </div>
 
               <nav className="space-y-2">
-                <Link
-                  href="/account"
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-900 bg-gray-100 rounded-md"
-                >
-                  <User className="h-4 w-4 mr-3" />
-                  Account Overview
-                </Link>
-                <Link
-                  href="/account/orders"
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                >
-                  <Package className="h-4 w-4 mr-3" />
-                  Order History
-                </Link>
-                <Link
-                  href="/account/addresses"
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                >
-                  <Settings className="h-4 w-4 mr-3" />
-                  Addresses
-                </Link>
-                <Link
-                  href="/account/payment"
-                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                >
-                  <CreditCard className="h-4 w-4 mr-3" />
-                  Payment Methods
-                </Link>
-              </nav>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="space-y-6">
-              {/* Account Overview */}
-              <div className="bg-white shadow rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Account Overview
-                </h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center">
-                      <Package className="h-8 w-8 text-primary-600" />
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-500">
-                          Total Orders
-                        </p>
-                        <p className="text-2xl font-bold text-gray-900">0</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center">
-                      <CreditCard className="h-8 w-8 text-green-600" />
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-gray-500">
-                          Account Status
-                        </p>
-                        <p className="text-lg font-semibold text-green-600">
-                          Active
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div className="bg-white shadow rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Recent Activity
-                </h2>
-
-                <div className="text-center py-8">
-                  <Package className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">
-                    No orders yet
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    When you place your first order, it will appear here.
-                  </p>
-                  <div className="mt-6">
+                {quickLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = link.href === "/account";
+                  return (
                     <Link
-                      href="/products"
-                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                        isActive
+                          ? "bg-primary-500/15 text-primary-700 shadow-subtle"
+                          : "text-slate-600 hover:bg-slate-100 hover:text-primary-600"
+                      }`}
                     >
-                      Browse Products
+                      <Icon className="h-4 w-4" />
+                      {link.label}
                     </Link>
+                  );
+                })}
+              </nav>
+            </aside>
+
+            <div className="space-y-6">
+              <div className="card-surface grid gap-6 p-6 sm:grid-cols-2">
+                <div className="rounded-2xl border border-primary-100 bg-white/70 p-5">
+                  <div className="flex items-center gap-4">
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-500/10 text-primary-600">
+                      <Package className="h-5 w-5" />
+                    </span>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-slate-900">
+                        Orders placed
+                      </p>
+                      <p className="text-2xl font-semibold text-primary-600">
+                        0
+                      </p>
+                    </div>
                   </div>
+                  <p className="mt-4 text-xs text-slate-500">
+                    Once you place your first order, status updates and tracking
+                    will appear here.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-primary-100 bg-white/70 p-5">
+                  <div className="flex items-center gap-4">
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-500/10 text-primary-600">
+                      <ShieldCheck className="h-5 w-5" />
+                    </span>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-slate-900">
+                        Account status
+                      </p>
+                      <p className="text-2xl font-semibold text-emerald-500">
+                        Active
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-xs text-slate-500">
+                    Licensed pharmacist review is enabled for all new
+                    prescriptions.
+                  </p>
                 </div>
               </div>
 
-              {/* Account Settings */}
-              <div className="bg-white shadow rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Account Settings
-                </h2>
+              <div className="card-surface p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900">
+                      Recent activity
+                    </h2>
+                    <p className="text-sm text-slate-500">
+                      Order confirmations, shipment tracking, and account
+                      updates appear in this timeline.
+                    </p>
+                  </div>
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center justify-center rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-primary-500"
+                  >
+                    Browse medications
+                  </Link>
+                </div>
+                <div className="mt-8 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-12 text-center">
+                  <CalendarCheck className="h-10 w-10 text-slate-300" />
+                  <p className="text-sm font-semibold text-slate-700">
+                    You have no recent orders yet
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Place your first order to activate real-time status updates.
+                  </p>
+                </div>
+              </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div className="card-surface p-6">
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Account preferences
+                </h2>
+                <div className="mt-6 space-y-5">
+                  <div className="flex flex-col gap-2 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        Email Address
+                      <p className="text-sm font-semibold text-slate-800">
+                        Email address
                       </p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                      <p className="text-xs text-slate-500">{user.email}</p>
                     </div>
-                    <button className="text-sm text-primary-600 hover:text-primary-500">
-                      Change
+                    <button className="text-sm font-medium text-primary-600 hover:text-primary-500">
+                      Update
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                  <div className="flex flex-col gap-2 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-semibold text-slate-800">
                         Password
                       </p>
-                      <p className="text-sm text-gray-500">
-                        Last updated recently
+                      <p className="text-xs text-slate-500">
+                        Last updated within the past 90 days
                       </p>
                     </div>
-                    <button className="text-sm text-primary-600 hover:text-primary-500">
-                      Change
+                    <button className="text-sm font-medium text-primary-600 hover:text-primary-500">
+                      Manage
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between py-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        Phone Number
+                      <p className="text-sm font-semibold text-slate-800">
+                        Phone number
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs text-slate-500">
                         {user.phone || "Not provided"}
                       </p>
                     </div>
-                    <button className="text-sm text-primary-600 hover:text-primary-500">
-                      {user.phone ? "Change" : "Add"}
+                    <button className="text-sm font-medium text-primary-600 hover:text-primary-500">
+                      {user.phone ? "Edit" : "Add"}
                     </button>
                   </div>
                 </div>
@@ -229,19 +240,7 @@ export default function AccountPage() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 mt-16">
-        <div className="container-custom">
-          <div className="text-center text-sm">
-            <p>
-              &copy; {new Date().getFullYear()} Oceanica Pharma. All rights
-              reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      </section>
     </div>
   );
 }

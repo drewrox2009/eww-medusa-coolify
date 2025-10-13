@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getProducts } from "@/lib/medusa/products";
 import ProductCard from "@/components/product/ProductCard";
 import ProductFilters from "@/components/product/ProductFilters";
@@ -13,118 +14,96 @@ export default async function ProductsPage({
     limit: 50,
   });
 
+  const items = products.products ?? [];
+  const resultCount = items.length;
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header with same navigation as homepage */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div className="container-custom">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center">
-              <a href="/" className="text-2xl font-bold text-primary-600">
-                PharmaDirect
-              </a>
+    <div className="bg-slate-50">
+      <section className="section-padding pt-0">
+        <div className="container-custom space-y-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-4">
+              <span className="badge-soft bg-primary-100 text-primary-800">
+                Explore treatments
+              </span>
+              <div className="space-y-2">
+                <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
+                  Shop medications by condition
+                </h1>
+                <p className="max-w-xl text-base text-slate-600">
+                  Discover clinically vetted generics with transparent pricing,
+                  pharmacist guidance, and global shipping.
+                </p>
+              </div>
             </div>
 
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/products" className="text-primary-600 font-semibold">
-                Products
-              </a>
-              <a
-                href="/about"
-                className="text-gray-700 hover:text-primary-600 transition-colors"
-              >
-                About
-              </a>
-              <a
-                href="/contact"
-                className="text-gray-700 hover:text-primary-600 transition-colors"
-              >
-                Contact
-              </a>
-            </nav>
-
-            <div className="flex items-center space-x-4">
-              <a
-                href="/cart"
-                className="text-gray-700 hover:text-primary-600 transition-colors"
-              >
-                Cart (0)
-              </a>
-              <a
-                href="/login"
-                className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
-              >
-                Sign In
-              </a>
+            <div className="w-full max-w-md">
+              <SearchBar initialQuery={searchParams.q} />
             </div>
           </div>
-        </div>
-      </header>
 
-      <div className="container-custom py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            All Products
-          </h1>
-          <p className="text-gray-600">
-            Browse our selection of affordable generic medications
-          </p>
-        </div>
-
-        {/* Search Bar */}
-        <div className="mb-6">
-          <SearchBar initialQuery={searchParams.q} />
-        </div>
-
-        {/* Main Content */}
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar */}
-          <aside className="lg:w-64 flex-shrink-0">
-            <ProductFilters />
-          </aside>
-
-          {/* Product Grid */}
-          <main className="flex-1">
-            {products.products && products.products.length > 0 ? (
-              <>
-                <div className="mb-4 text-sm text-gray-600">
-                  Showing {products.products.length}{" "}
-                  {products.products.length === 1 ? "product" : "products"}
+          <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+            <aside className="card-surface h-full p-6">
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    Filter results
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Refine by therapeutic class, dosage form, and other
+                    criteria.
+                  </p>
                 </div>
+                <ProductFilters />
+              </div>
+            </aside>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.products.map((product: any) => (
+            <main className="space-y-6">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm font-medium text-slate-600">
+                  {resultCount === 0
+                    ? "No medications found"
+                    : `Showing ${resultCount} ${
+                        resultCount === 1 ? "medication" : "medications"
+                      }`}
+                </p>
+                {searchParams.q && (
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500"
+                  >
+                    Reset search
+                  </Link>
+                )}
+              </div>
+
+              {resultCount > 0 ? (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {items.map((product: any) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
-              </>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-gray-600 mb-4">No products found</p>
-                <a
-                  href="/products"
-                  className="text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  Clear filters
-                </a>
-              </div>
-            )}
-          </main>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12 mt-16">
-        <div className="container-custom">
-          <div className="text-center text-sm">
-            <p>
-              &copy; {new Date().getFullYear()} PharmaDirect. All rights
-              reserved.
-            </p>
+              ) : (
+                <div className="card-surface flex flex-col items-center gap-4 px-10 py-12 text-center">
+                  <p className="text-base font-semibold text-slate-900">
+                    Adjust your filters to find additional medications.
+                  </p>
+                  <p className="text-sm text-slate-500">
+                    Try searching by condition name or remove filters to browse
+                    the full catalog.
+                  </p>
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-500"
+                  >
+                    View all medications
+                  </Link>
+                </div>
+              )}
+            </main>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }

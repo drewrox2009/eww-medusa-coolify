@@ -42,6 +42,30 @@ const config: Config = {
           DEFAULT: "#64748B",
           foreground: "#FFFFFF",
         },
+        clinical: {
+          50: "#F4F6FB",
+          100: "#E8EDF7",
+          200: "#D4DFF0",
+          300: "#B4C9E6",
+          400: "#8BAAD8",
+          500: "#4F7BC3",
+          600: "#3E64A5",
+          700: "#324F85",
+          800: "#294169",
+          900: "#223654",
+        },
+        slate: {
+          50: "#F8FAFC",
+          100: "#EEF2F6",
+          200: "#E2E8F0",
+          300: "#CBD5E1",
+          400: "#94A3B8",
+          500: "#64748B",
+          600: "#475569",
+          700: "#334155",
+          800: "#1E293B",
+          900: "#0F172A",
+        },
         success: {
           DEFAULT: "#10B981",
           foreground: "#FFFFFF",
@@ -71,6 +95,14 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        ambient: "0 25px 60px -20px rgba(37, 99, 235, 0.18)",
+        subtle: "0 15px 30px -15px rgba(15, 23, 42, 0.1)",
+      },
+      backgroundImage: {
+        "hero-grid":
+          "radial-gradient(circle at 1px 1px, rgba(37,99,235,0.08) 1px, transparent 0)",
       },
       keyframes: {
         "accordion-down": {
