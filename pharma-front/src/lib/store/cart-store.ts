@@ -13,6 +13,7 @@ interface CartStore {
   incrementItemCount: () => void;
   decrementItemCount: () => void;
   resetCart: () => void;
+  clearCart: () => void;
 
   // Async actions
   initializeCart: () => Promise<void>;
@@ -39,6 +40,8 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({ itemCount: Math.max(0, state.itemCount - 1) })),
 
       resetCart: () => set({ cartId: null, itemCount: 0 }),
+
+      clearCart: () => set({ cartId: null, itemCount: 0 }),
 
       initializeCart: async () => {
         const { cartId } = get();
