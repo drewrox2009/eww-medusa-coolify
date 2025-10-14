@@ -16,7 +16,7 @@ export const sendInviteNotificationWorkflow = createWorkflow(
 
     const { data: invites } = useQueryGraphStep({
       entity: "invite",
-      fields: ["id", "email", "token", "user.*", "role.*"],
+      fields: ["id", "email", "token"],
       filters: {
         id,
       },

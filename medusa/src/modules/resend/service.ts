@@ -41,7 +41,7 @@ const builtinTemplates: Record<string, TemplateRenderer | string> = {
     <h1>You've been invited!</h1>
     <p>You have been invited to join our platform.</p>
     <p>Please use the following link to accept your invitation:</p>
-    <a href="{{invite.token}}">Accept Invitation</a>
+    <a href="https://medusa.eww-pew.com/app/invite?token={{invite.token}}">Accept Invitation</a>
   `,
 };
 
