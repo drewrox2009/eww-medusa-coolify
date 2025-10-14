@@ -18,6 +18,9 @@ export const sendInviteNotificationWorkflow = createWorkflow(
       filters: {
         id,
       },
+      options: {
+        throwIfKeyNotFound: true,
+      },
     });
 
     const notification = sendNotificationStep([

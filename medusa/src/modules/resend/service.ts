@@ -30,7 +30,20 @@ type TemplateRenderer = (data: Record<string, unknown>) => ReactNode;
  * additional configuration. Consumers can also provide templates at runtime
  * through the provider options.
  */
-const builtinTemplates: Record<string, TemplateRenderer | string> = {};
+const builtinTemplates: Record<string, TemplateRenderer | string> = {
+  "order-placed": `
+    <h1>Order Confirmation</h1>
+    <p>Thank you for your order!</p>
+    <p>Order ID: {{order.display_id}}</p>
+    <p>Total: {{order.total}} {{order.currency_code}}</p>
+  `,
+  "user-invited": `
+    <h1>You've been invited!</h1>
+    <p>You have been invited to join our platform.</p>
+    <p>Please use the following link to accept your invitation:</p>
+    <a href="{{invite.token}}">Accept Invitation</a>
+  `,
+};
 
 type InjectedDependencies = {
   logger: Logger;
@@ -75,6 +88,12 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
   async send(
     notification: ProviderSendNotificationDTO
   ): Promise<ProviderSendNotificationResultsDTO> {
+    this.logger.info(
+      `Attempting to send notification via Resend: ${JSON.stringify(
+        notification
+      )}`
+    );
+
     if (!this.canSend(notification.channel)) {
       this.logger.warn(
         `Skipping notification because channel '${notification.channel}' is not enabled for Resend`
@@ -93,6 +112,10 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
       return {};
     }
 
+    this.logger.info(
+      `Sending email with options: ${JSON.stringify(emailOptions)}`
+    );
+
     try {
       const { data, error } = await this.resendClient.emails.send(emailOptions);
 
@@ -107,6 +130,7 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
         return {};
       }
 
+      this.logger.info(`Email sent successfully with ID: ${data.id}`);
       return { id: data.id };
     } catch (error) {
       this.logger.error(
@@ -181,17 +205,43 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     }
 
     if (typeof template === "string") {
+      // Simple template replacement for basic variables
+      let html = template;
+      if (data.order) {
+        const order = data.order as any;
+        html = html.replace(
+          /\{\{order\.display_id\}\}/g,
+          order.display_id || ""
+        );
+        html = html.replace(/\{\{order\.total\}\}/g, order.total || "");
+        html = html.replace(
+          /\{\{order\.currency_code\}\}/g,
+          order.currency_code || ""
+        );
+      }
+      if (data.invite) {
+        const invite = data.invite as any;
+        html = html.replace(/\{\{invite\.token\}\}/g, invite.token || "");
+      }
       return {
         ...baseOptions,
-        html: template,
+        html,
       } as CreateEmailOptions;
     }
 
     if (typeof template === "function") {
-      return {
-        ...baseOptions,
-        react: template(data),
-      } as CreateEmailOptions;
+      try {
+        return {
+          ...baseOptions,
+          react: template(data),
+        } as CreateEmailOptions;
+      } catch (error) {
+        this.logger.error(
+          `Failed to render React template '${templateKey}':`,
+          error
+        );
+        return null;
+      }
     }
 
     const html = this.resolveString(data.html);

@@ -37,6 +37,9 @@ export const sendOrderConfirmationWorkflow = createWorkflow(
       filters: {
         id,
       },
+      options: {
+        throwIfKeyNotFound: true,
+      },
     });
 
     const notification = sendNotificationStep([
