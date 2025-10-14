@@ -10,7 +10,10 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   // Get the lowest price variant
   const lowestPrice = product.variants?.reduce((min, variant) => {
-    const price = variant.prices?.[0]?.amount || 0;
+    const price =
+      variant.calculated_price?.calculated_amount ||
+      variant.prices?.[0]?.amount ||
+      0;
     return price < min ? price : min;
   }, Infinity);
 

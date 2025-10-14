@@ -18,6 +18,10 @@ export interface ProductVariant {
     amount: number;
     currency_code: string;
   }>;
+  calculated_price?: {
+    calculated_amount: number;
+    currency_code: string;
+  };
   metadata?: PharmaceuticalMetadata;
   inventory_quantity?: number;
   manage_inventory?: boolean;

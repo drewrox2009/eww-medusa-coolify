@@ -26,7 +26,10 @@ export default function VariantSelector({ product }: VariantSelectorProps) {
 
       <div className="grid grid-cols-1 gap-3">
         {product.variants.map((variant: any) => {
-          const price = variant.calculated_price?.calculated_amount || 0;
+          const price =
+            variant.calculated_price?.calculated_amount ||
+            variant.prices?.[0]?.amount ||
+            0;
           const isSelected = variant.id === selectedVariant;
 
           return (

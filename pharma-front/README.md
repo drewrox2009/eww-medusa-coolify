@@ -1,24 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Oceanica Pharma - Frontend
+
+A modern, trustworthy pharmaceutical e-commerce platform built with Next.js 14 and Medusa backend.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- **Node.js 20+** (Required for Medusa SDK compatibility)
+- npm or yarn package manager
+- Medusa backend running (see medusa/ directory)
+
+### Installation
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Set up environment variables:
+
+```bash
+cp .env.production .env.local
+# Edit .env.local with your configuration
+```
+
+3. Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Key Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# Medusa Backend
+NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=your-key
+
+# Payment Providers (configure as needed)
+BTCPAY_SERVER_URL=https://your-btcpay-server.com
+SOLANA_MERCHANT_WALLET=your-solana-address
+SHKEEPER_API_KEY=your-shkeeper-key
+NOWPAYMENTS_API_KEY=your-nowpayments-key
+```
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+
+### Project Structure
+
+- `src/app/` - Next.js App Router pages
+- `src/components/` - React components
+- `src/lib/` - Utilities and API integrations
+- `docs/` - Documentation and guides
 
 ## Learn More
 

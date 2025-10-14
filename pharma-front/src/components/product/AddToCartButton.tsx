@@ -19,7 +19,10 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
   const { addItem } = useCartStore();
 
   const handleAddToCart = async () => {
-    if (!selectedVariantId) return;
+    if (!selectedVariantId) {
+      alert("Please select a variant first.");
+      return;
+    }
 
     setIsAdding(true);
     try {
