@@ -106,7 +106,7 @@ export default function Home() {
     <div className="space-y-0">
       {/* Hero */}
       <section className="hero-surface section-padding pb-10 lg:pb-12">
-        <div className="container-custom grid gap-16 lg:grid-cols-[1.1fr_minmax(0,0.9fr)] lg:items-center">
+        <div className="container-custom grid gap-16 lg:grid-cols-[1.1fr_minmax(0,0.9fr)] lg:items-center lg:min-h-[600px]">
           <div className="space-y-8">
             <span className="badge-soft bg-primary-100 text-primary-800">
               Licensed international fulfillment
@@ -159,7 +159,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative flex items-center justify-center">
             <div className="card-surface relative overflow-hidden rounded-[32px] border-primary-100/60 bg-white/80 p-6">
               <div className="relative h-[420px] overflow-hidden rounded-3xl">
                 <Image

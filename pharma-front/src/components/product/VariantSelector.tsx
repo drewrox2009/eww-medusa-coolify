@@ -20,7 +20,7 @@ export default function VariantSelector({ product }: VariantSelectorProps) {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-900 mb-3">
+      <label className="block text-sm font-medium text-slate-900 mb-3">
         Select Dosage & Quantity
       </label>
 
@@ -41,20 +41,20 @@ export default function VariantSelector({ product }: VariantSelectorProps) {
                 ${
                   isSelected
                     ? "border-primary-600 bg-primary-50"
-                    : "border-gray-200 bg-white hover:border-gray-300"
+                    : "border-slate-200 bg-white hover:border-slate-300"
                 }
               `}
             >
               <div className="flex-1 text-left">
                 <p
                   className={`font-semibold ${
-                    isSelected ? "text-primary-900" : "text-gray-900"
+                    isSelected ? "text-primary-900" : "text-slate-900"
                   }`}
                 >
                   {variant.title}
                 </p>
                 {variant.sku && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     SKU: {variant.sku}
                   </p>
                 )}
@@ -63,13 +63,13 @@ export default function VariantSelector({ product }: VariantSelectorProps) {
               <div className="text-right ml-4">
                 <p
                   className={`text-lg font-bold ${
-                    isSelected ? "text-primary-700" : "text-gray-900"
+                    isSelected ? "text-primary-700" : "text-slate-900"
                   }`}
                 >
                   {formatPrice(price)}
                 </p>
                 {variant.inventory_quantity !== undefined && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     {variant.inventory_quantity > 0
                       ? `${variant.inventory_quantity} in stock`
                       : "Out of stock"}
@@ -99,8 +99,8 @@ export default function VariantSelector({ product }: VariantSelectorProps) {
 
       {/* Selected Variant Info */}
       {selected && (
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-700">
+        <div className="mt-4 p-4 bg-slate-50 rounded-lg">
+          <p className="text-sm text-slate-700">
             <span className="font-semibold">Selected:</span> {selected.title}
           </p>
         </div>

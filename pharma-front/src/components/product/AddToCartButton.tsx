@@ -10,7 +10,7 @@ interface AddToCartButtonProps {
 
 export default function AddToCartButton({ product }: AddToCartButtonProps) {
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariantId, setSelectedVariantId] = useState(
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
     product.variants?.[0]?.id || null
   );
   const [isAdding, setIsAdding] = useState(false);
@@ -41,13 +41,13 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
     <div className="space-y-4">
       {/* Quantity Selector */}
       <div>
-        <label className="block text-sm font-medium text-gray-900 mb-2">
+        <label className="block text-sm font-medium text-slate-900 mb-2">
           Quantity
         </label>
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="w-10 h-10 flex items-center justify-center border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
             type="button"
           >
             -
@@ -58,12 +58,12 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
             onChange={(e) =>
               setQuantity(Math.max(1, parseInt(e.target.value) || 1))
             }
-            className="w-20 h-10 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-20 h-10 text-center border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             min="1"
           />
           <button
             onClick={() => setQuantity(quantity + 1)}
-            className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="w-10 h-10 flex items-center justify-center border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
             type="button"
           >
             +
@@ -75,7 +75,7 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
       <button
         onClick={handleAddToCart}
         disabled={isAdding || !selectedVariantId}
-        className="w-full flex items-center justify-center space-x-2 px-6 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        className="w-full flex items-center justify-center space-x-2 px-6 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
       >
         {isAdding ? (
           <>

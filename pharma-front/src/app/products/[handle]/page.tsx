@@ -64,9 +64,10 @@ const infoHighlights = [
 export default async function ProductDetailPage({
   params,
 }: {
-  params: { handle: string };
+  params: Promise<{ handle: string }>;
 }) {
-  const product = await getProduct(params.handle);
+  const resolvedParams = await params;
+  const product = await getProduct(resolvedParams.handle);
 
   if (!product) {
     notFound();

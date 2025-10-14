@@ -7,10 +7,11 @@ import SearchBar from "@/components/common/SearchBar";
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: { category?: string; q?: string };
+  searchParams: Promise<{ category?: string; q?: string }>;
 }) {
+  const params = await searchParams;
   const products = await getProducts({
-    q: searchParams.q,
+    q: params.q,
     limit: 50,
   });
 
@@ -38,7 +39,7 @@ export default async function ProductsPage({
             </div>
 
             <div className="w-full max-w-md">
-              <SearchBar initialQuery={searchParams.q} />
+              <SearchBar initialQuery={params.q} />
             </div>
           </div>
 
@@ -67,7 +68,7 @@ export default async function ProductsPage({
                         resultCount === 1 ? "medication" : "medications"
                       }`}
                 </p>
-                {searchParams.q && (
+                {params.q && (
                   <Link
                     href="/products"
                     className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500"
