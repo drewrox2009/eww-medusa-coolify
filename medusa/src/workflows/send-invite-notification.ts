@@ -12,6 +12,8 @@ type WorkflowInput = {
 export const sendInviteNotificationWorkflow = createWorkflow(
   "send-invite-notification",
   ({ id }: WorkflowInput) => {
+    console.log("sendInviteNotificationWorkflow started with id:", id);
+
     const { data: invites } = useQueryGraphStep({
       entity: "invite",
       fields: ["id", "email", "token", "user.*", "role.*"],
@@ -22,6 +24,8 @@ export const sendInviteNotificationWorkflow = createWorkflow(
         throwIfKeyNotFound: true,
       },
     });
+
+    console.log("Retrieved invites:", JSON.stringify(invites, null, 2));
 
     const notification = sendNotificationStep([
       {
@@ -34,6 +38,7 @@ export const sendInviteNotificationWorkflow = createWorkflow(
       },
     ]);
 
+    console.log("Notification step completed");
     return new WorkflowResponse(notification);
   }
 );
