@@ -1,189 +1,105 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, User, Menu, X, Headphones } from "lucide-react";
-import { useUserStore } from "@/lib/store/user-store";
-import { useCartStore } from "@/lib/store/cart-store";
-import { cn } from "@/lib/utils/cn";
-
-const navigation = [
-  { href: "/products", label: "Products" },
-  { href: "/categories", label: "Categories" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Support" },
-];
+import { useState } from "react";
 
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const { user, isAuthenticated } = useUserStore();
-  const { itemCount } = useCartStore();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 12);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 w-full border-b transition-all duration-300",
-        "backdrop-blur-sm",
-        isScrolled
-          ? "border-gray-200 bg-white/95 shadow-floating"
-          : "border-transparent bg-white"
-      )}
-    >
-      <div className="container-custom">
-        <div className="flex h-20 items-center justify-between gap-6">
+    <header className="border-b border-gray-200 bg-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link
-            href="/"
-            className="relative flex h-10 items-center gap-2"
-            aria-label="Octochems homepage"
-          >
-            <Image
-              src="/octochems-logo.svg"
-              alt="Octochems"
-              width={192}
-              height={52}
-              className="h-12 w-auto object-contain sm:h-14"
-              priority
-              sizes="(min-width: 1024px) 176px, 164px"
-            />
-          </Link>
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center space-x-2">
+              <Image
+                src="/octochems-logo.svg"
+                alt="Octochems"
+                width={32}
+                height={32}
+                className="h-8 w-8"
+              />
+              <span className="text-xl font-bold text-black">Octochems</span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-8 lg:flex">
-            {navigation.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-sm font-medium text-gray-600 transition-colors hover:text-black"
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link href="/products" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+              Products
+            </Link>
+            <Link href="/categories" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+              Categories
+            </Link>
+            <Link href="/about" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+              About
+            </Link>
+            <Link href="/contact" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+              Contact
+            </Link>
           </nav>
 
-          {/* User Actions */}
-          <div className="flex items-center gap-4">
-            <Link
-              href="/cart"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:border-black hover:text-black"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {itemCount > 0 && (
-                <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-black text-[11px] font-semibold text-white">
-                  {itemCount}
-                </span>
-              )}
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            <Link href="/cart" className="p-2 text-gray-600 hover:text-black transition-colors">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.1 5H19M7 13v8a2 2 0 002 2h10a2 2 0 002-2v-3" />
+              </svg>
+            </Link>
+            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+              Sign In
             </Link>
 
-            <Link
-              href="/contact"
-              className="hidden items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg lg:inline-flex"
-            >
-              <Headphones className="h-4 w-4" />
-              Live Support
-            </Link>
-
-            {isAuthenticated ? (
-              <Link
-                href="/account"
-                className="hidden items-center gap-2 rounded-md bg-black px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 lg:inline-flex"
-              >
-                <User className="h-4 w-4" />
-                {user?.first_name || "Account"}
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="hidden rounded-md border border-gray-200 bg-white px-5 py-2 text-sm font-semibold text-black shadow-sm transition hover:bg-gray-50 lg:inline-flex"
-              >
-                Sign In
-              </Link>
-            )}
-
-            {/* Mobile Menu Toggle */}
+            {/* Mobile menu button */}
             <button
-              type="button"
-              onClick={() => setMobileMenuOpen((state) => !state)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition hover:border-black hover:text-black lg:hidden"
-              aria-label="Toggle navigation"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 text-gray-600 hover:text-black"
             >
-              {mobileMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="pb-6 lg:hidden">
-            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-lg">
-              <nav className="space-y-4">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block text-base font-medium text-gray-700 transition hover:text-black"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="mt-6 space-y-4 border-t border-gray-200 pt-6">
-                {isAuthenticated ? (
-                  <Link
-                    href="/account"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-2 rounded-full bg-black px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
-                  >
-                    <User className="h-4 w-4" />
-                    Manage Account
-                  </Link>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2 rounded-full bg-black px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
-                    >
-                      <User className="h-4 w-4" />
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-50"
-                    >
-                      Create Account
-                    </Link>
-                  </div>
-                )}
-
-                <Link
-                  href="/contact"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-full bg-gray-50 px-5 py-3 text-sm font-semibold text-black transition hover:bg-gray-100"
-                >
-                  <Headphones className="h-4 w-4" />
-                  Contact Support
-                </Link>
-              </div>
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 bg-white">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link
+                href="/products"
+                className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Products
+              </Link>
+              <Link
+                href="/categories"
+                className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Categories
+              </Link>
+              <Link
+                href="/about"
+                className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/contact"
+                className="block px-3 py-2 text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact
+              </Link>
             </div>
           </div>
         )}

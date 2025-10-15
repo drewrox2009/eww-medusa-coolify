@@ -1,88 +1,54 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils/format";
-import type { Product } from "@/lib/types";
 
 interface ProductCardProps {
-  product: Product;
+  product: any;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  // Get the lowest price variant
-  const lowestPrice = product.variants?.reduce((min, variant) => {
-    const price =
-      variant.calculated_price?.calculated_amount ||
-      variant.prices?.[0]?.amount ||
-      0;
-    return price < min ? price : min;
-  }, Infinity);
-
-  // Get variant count
-  const variantCount = product.variants?.length || 0;
-
   return (
-    <Link href={`/products/${product.handle}`}>
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:border-black transition-all duration-200 h-full flex flex-col">
-        {/* Product Image */}
-        <div className="relative h-48 bg-gray-100">
-          {product.thumbnail ? (
-            <Image
-              src={product.thumbnail}
-              alt={product.title}
-              fill
-              className="object-contain p-4"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-              No image
-            </div>
-          )}
-        </div>
+    <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+      <div className="aspect-square w-full bg-gray-100 rounded-md mb-4 flex items-center justify-center">
+        {product.thumbnail ? (
+          <Image
+            src={product.thumbnail}
+            alt={product.title}
+            width={200}
+            height={200}
+            className="w-full h-full object-cover rounded-md"
+          />
+        ) : (
+          <span className="text-gray-400 text-sm">Product Image</span>
+        )}
+      </div>
 
-        {/* Product Info */}
-        <div className="p-4 flex-1 flex flex-col">
-          <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
-              {product.title}
-            </h3>
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold text-black line-clamp-2">
+          {product.title}
+        </h3>
 
-            {product.subtitle && (
-              <p className="text-sm text-gray-600 mb-2">{product.subtitle}</p>
-            )}
+        {product.subtitle && (
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {product.subtitle}
+          </p>
+        )}
 
-            {product.description && (
-              <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-                {product.description}
-              </p>
-            )}
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex flex-col">
+            <span className="text-xl font-bold text-black">
+              ${product.variants?.[0]?.prices?.[0]?.amount ? (product.variants[0].prices[0].amount / 100).toFixed(2) : 'N/A'}
+            </span>
           </div>
 
-          {/* Pricing and CTA */}
-          <div className="mt-auto pt-3 border-t border-gray-100">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-sm text-gray-500">Starting at</p>
-                <p className="text-lg font-bold text-gray-900">
-                  {lowestPrice && lowestPrice !== Infinity
-                    ? formatPrice(lowestPrice)
-                    : "Price unavailable"}
-                </p>
-              </div>
-
-              {variantCount > 1 && (
-                <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                  {variantCount} options
-                </span>
-              )}
-            </div>
-
-            <button className="w-full px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800 transition-colors">
-              View Details
-            </button>
-          </div>
+          <Link
+            href={`/products/${product.handle}`}
+            className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
+          >
+            View Details
+          </Link>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
