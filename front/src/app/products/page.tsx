@@ -19,19 +19,19 @@ export default async function ProductsPage({
   const resultCount = items.length;
 
   return (
-    <div className="bg-slate-50">
+    <div className="bg-gray-50">
       <section className="section-padding pt-0">
         <div className="container-custom space-y-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-4">
-              <span className="badge-soft bg-primary-100 text-primary-800">
-                Explore treatments
+              <span className="badge">
+                Explore compounds
               </span>
               <div className="space-y-2">
-                <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
-                  Shop medications by condition
+                <h1 className="text-3xl font-semibold text-black sm:text-4xl">
+                  Shop research compounds by category
                 </h1>
-                <p className="max-w-xl text-base text-slate-600">
+                <p className="max-w-xl text-base text-gray-600">
                   Discover clinically vetted generics with transparent pricing,
                   pharmacist guidance, and global shipping.
                 </p>
@@ -47,10 +47,10 @@ export default async function ProductsPage({
             <aside className="card-surface h-full p-6">
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">
+                  <h2 className="text-lg font-semibold text-black">
                     Filter results
                   </h2>
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="mt-1 text-sm text-gray-500">
                     Refine by therapeutic class, dosage form, and other
                     criteria.
                   </p>
@@ -61,17 +61,17 @@ export default async function ProductsPage({
 
             <main className="space-y-6">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm font-medium text-slate-600">
+                <p className="text-sm font-medium text-gray-600">
                   {resultCount === 0
-                    ? "No medications found"
+                    ? "No compounds found"
                     : `Showing ${resultCount} ${
-                        resultCount === 1 ? "medication" : "medications"
+                        resultCount === 1 ? "compound" : "compounds"
                       }`}
                 </p>
                 {params.q && (
                   <Link
                     href="/products"
-                    className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500"
+                    className="inline-flex items-center text-sm font-medium text-black hover:text-gray-800"
                   >
                     Reset search
                   </Link>
@@ -86,10 +86,10 @@ export default async function ProductsPage({
                 </div>
               ) : (
                 <div className="card-surface flex flex-col items-center gap-4 px-10 py-12 text-center">
-                  <p className="text-base font-semibold text-slate-900">
-                    Adjust your filters to find additional medications.
+                  <p className="text-base font-semibold text-black">
+                    Adjust your filters to find additional compounds.
                   </p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-gray-500">
                     Try searching by condition name or remove filters to browse
                     the full catalog.
                   </p>
@@ -97,7 +97,7 @@ export default async function ProductsPage({
                     href="/products"
                     className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-500"
                   >
-                    View all medications
+                    View all compounds
                   </Link>
                 </div>
               )}

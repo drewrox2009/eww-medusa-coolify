@@ -147,14 +147,14 @@ export default function Home() {
                 href="/products"
                 className="inline-flex items-center justify-center rounded-md bg-black px-8 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
               >
-                Shop Medications
+                Shop Catalog
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link
                 href="/contact"
                 className="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-8 py-3 text-sm font-semibold text-black transition hover:bg-gray-50"
               >
-                Consult Pharmacist
+                Contact Support
               </Link>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function Home() {
         <div className="container-custom space-y-10">
           <div className="max-w-3xl space-y-4">
             <h2 className="text-3xl font-semibold text-black sm:text-4xl">
-              Pharmaceutical standards, patient-first care
+              Research-grade standards, quality-first service
             </h2>
             <p className="text-lg text-gray-600">
               Our international network of licensed pharmacists and accredited
@@ -230,7 +230,7 @@ export default function Home() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-4">
               <h2 className="text-3xl font-semibold text-black sm:text-4xl">
-                Seamless ordering with compliant oversight
+                Seamless ordering with quality oversight
               </h2>
               <p className="max-w-2xl text-lg text-gray-600">
                 Oceanica streamlines the entire journey—from selecting the right
@@ -279,7 +279,7 @@ export default function Home() {
               Tailored treatment categories
             </span>
             <h2 className="text-3xl font-semibold text-black sm:text-4xl">
-              Find medications aligned to your care plan
+              Find compounds aligned to your research goals
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-gray-600">
               Explore common therapeutic areas curated by clinical specialists
@@ -306,7 +306,7 @@ export default function Home() {
                     {category.description}
                   </p>
                   <span className="inline-flex items-center text-sm font-semibold text-black">
-                    View treatments
+                    View products
                     <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" />
                   </span>
                 </div>
@@ -323,13 +323,13 @@ export default function Home() {
             <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-center">
               <div className="space-y-6">
                 <p className="badge text-black">
-                  Ready to begin?
+                  Ready to start?
                 </p>
                 <h2 className="text-3xl font-semibold text-black sm:text-4xl">
-                  Start your secure treatment journey with Oceanica today
+                  Start your research journey with Octochems today
                 </h2>
                 <p className="max-w-xl text-base text-gray-600">
-                  Create an account to access pharmacist consultations, saved
+                  Create an account to access research consultations, saved
                   prescriptions, and real-time order tracking with encrypted
                   payment options.
                 </p>
@@ -338,25 +338,25 @@ export default function Home() {
                     href="/register"
                     className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/30 transition hover:bg-primary-500 hover:shadow-primary-400/60"
                   >
-                    Create account
+                    Create Account
                   </Link>
                   <Link
                     href="/products"
                     className="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-black transition hover:border-primary-300 hover:bg-primary-50 hover:text-black"
                   >
-                    Browse catalog
+                    Browse Catalog
                   </Link>
                 </div>
               </div>
               <div className="rounded-lg border border-gray-200 bg-gray-100 p-8 text-sm text-gray-600">
                 <p className="font-semibold uppercase tracking-wide text-black">
-                  Regulatory assurance
+                  Quality assurance
                 </p>
                 <ul className="mt-4 space-y-3">
-                  <li>• Pharmacist verification on every new order</li>
+                  <li>• Quality verification on every order</li>
                   <li>• Multi-point temperature and chain-of-custody checks</li>
-                  <li>• HIPAA-aligned data handling and storage</li>
-                  <li>• 24/7 live patient support across time zones</li>
+                  <li>• Secure data handling and storage</li>
+                  <li>• 24/7 research support across time zones</li>
                 </ul>
               </div>
             </div>
