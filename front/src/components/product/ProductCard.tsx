@@ -22,7 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.handle}`}>
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:border-primary-300 transition-all duration-200 h-full flex flex-col">
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:border-black transition-all duration-200 h-full flex flex-col">
         {/* Product Image */}
         <div className="relative h-48 bg-gray-100">
           {product.thumbnail ? (
@@ -77,7 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               )}
             </div>
 
-            <button className="w-full px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+            <button className="w-full px-4 py-2 text-sm font-medium text-white bg-black rounded-md hover:bg-gray-800 transition-colors">
               View Details
             </button>
           </div>
