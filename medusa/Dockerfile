@@ -83,11 +83,16 @@ RUN rm /app/medusa/.medusa/server/migrations.sh
 
 # Run seed script if RUN_SEED environment variable is set to "true"
 RUN if [ "$RUN_SEED" = "true" ]; then \
-    echo "Running seed script..."; \
-    node /app/medusa/.medusa/server/src/scripts/seed.js; \
-    echo "Seed script completed."; \
+    echo "RUN_SEED is set to 'true', but will run after container starts"; \
   else \
-    echo "RUN_SEED is not set to 'true', skipping seed script."; \
+    echo "RUN_SEED is not set to 'true', skipping seed script during build."; \
   fi
 
-CMD ["yarn", "run", ,"seed", "start"]
+# Add a script to run seed after startup
+COPY seed-script.sh /app/medusa/.medusa/server/seed-script.sh
+RUN chmod +x /app/medusa/.medusa/server/seed-script.sh
+
+# Modify the start command to check for seed script
+CMD ["sh", "-c", "if [ \"$RUN_SEED\" = \"true\" ]; then echo \"Waiting 10 seconds before running seed...\" && sleep 10 && /app/medusa/.medusa/server/seed-script.sh; else yarn start; fi"]
+
+CMD ["yarn", "run", "start"]
