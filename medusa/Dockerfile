@@ -33,6 +33,7 @@ ARG S3_SECRET_ACCESS_KEY
 ARG S3_REGION
 ARG S3_BUCKET
 ARG S3_ENDPOINT
+ARG RUN_SEED
 
 ENV COOKIE_SECRET=${COOKIE_SECRET}
 ENV JWT_SECRET=${JWT_SECRET}
@@ -51,6 +52,7 @@ ENV S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
 ENV S3_REGION=${S3_REGION}
 ENV S3_BUCKET=${S3_BUCKET}
 ENV S3_ENDPOINT=${S3_ENDPOINT}
+ENV RUN_SEED=${RUN_SEED}
 
 RUN echo "${PORT}"
 
@@ -72,11 +74,20 @@ WORKDIR /app/medusa/.medusa/server
 RUN yarn install --production
 
 
-# RUN medusa migrations run 
+# RUN medusa migrations run
 COPY migrations.sh /app/medusa/.medusa/server/migrations.sh
 RUN chmod +x /app/medusa/.medusa/server/migrations.sh
 RUN /app/medusa/.medusa/server/migrations.sh
 
 RUN rm /app/medusa/.medusa/server/migrations.sh
+
+# Run seed script if RUN_SEED environment variable is set to "true"
+RUN if [ "$RUN_SEED" = "true" ]; then \
+    echo "Running seed script..."; \
+    node /app/medusa/.medusa/server/src/scripts/seed.js; \
+    echo "Seed script completed."; \
+  else \
+    echo "RUN_SEED is not set to 'true', skipping seed script."; \
+  fi
 
 CMD ["yarn", "run", "start"]
