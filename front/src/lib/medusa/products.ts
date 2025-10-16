@@ -16,7 +16,7 @@ export async function getProducts(params?: {
 }
 
 export async function getProduct(handle: string) {
-  const response = await medusa.store.product.list({ handle });
+  const response = await medusa.store.product.list({ handle, expand: "variants.prices" });
   return response.products?.[0] || null;
 }
 
