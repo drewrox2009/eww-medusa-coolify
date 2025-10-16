@@ -1,9 +1,4 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
-import {
-  createPaymentCollectionForCartWorkflow,
-  createPaymentSessionsWorkflow,
-  completeCartWorkflow
-} from "@medusajs/medusa/core-flows";
 
 export async function GET(
   req: MedusaRequest,
@@ -20,31 +15,54 @@ export async function POST(
 
   try {
     if (action === "complete_cart") {
-      // First create payment collection for the cart
-      const paymentCollection = await createPaymentCollectionForCartWorkflow(req.scope).run({
-        input: {
-          cart_id: cartId
-        }
+      // Use the container to resolve services
+      const cartModuleService = req.scope.resolve("cartModuleService");
+      const paymentModuleService = req.scope.resolve("paymentModuleService");
+      
+      // Get the cart to retrieve total amount
+      const cart = await cartModuleService.retrieveCarts(
+        { id: cartId },
+        { relations: ["items"] }
+      );
+      
+      if (!cart || cart.length === 0) {
+        return res.status(404).json({ error: "Cart not found" });
+      }
+      
+      const cartData = cart[0];
+      
+      // Create a payment collection for the cart
+      const paymentCollection = await paymentModuleService.createPaymentCollections({
+        cart_id: cartId,
+        amount: cartData.total,
+        currency_code: cartData.currency_code
       });
 
-      // Then create payment sessions for the collection
-      await createPaymentSessionsWorkflow(req.scope).run({
-        input: {
-          payment_collection_id: paymentCollection.result.id,
-          provider_id: "manual" // Use manual payment provider
-        }
+      // Create a payment session with the manual provider
+      const paymentSession = await paymentModuleService.createPaymentSessions({
+        payment_collection_id: paymentCollection.id,
+        provider_id: "manual",
+        data: {}
       });
 
-      // Finally complete the cart
-      const { result } = await completeCartWorkflow(req.scope).run({
-        input: {
-          id: cartId
-        }
+      // Authorize the payment
+      await paymentModuleService.authorizePaymentSession({
+        payment_id: paymentSession.id,
+        context: {}
       });
+
+      // Capture the payment
+      await paymentModuleService.capturePayment({
+        payment_id: paymentSession.id,
+        amount: paymentCollection.amount
+      });
+
+      // Complete the cart
+      const order = await cartModuleService.completeCart(cartId);
 
       res.json({
         success: true,
-        order: (result as any).order || result,
+        order: order,
       });
     } else {
       res.status(400).json({ error: "Invalid action" });
