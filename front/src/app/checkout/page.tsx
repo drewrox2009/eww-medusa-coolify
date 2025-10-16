@@ -419,10 +419,16 @@ export default function CheckoutPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm"
+                        className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg min-w-[200px]"
                       >
-                        {loading ? "Saving..." : "Continue to Payment"}
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        {loading ? (
+                          <>Saving...</>
+                        ) : (
+                          <>
+                            Continue to Payment
+                            <ArrowRight className="ml-2 h-4 w-4 flex-shrink-0" />
+                          </>
+                        )}
                       </button>
                     </div>
                   </form>
@@ -558,21 +564,25 @@ export default function CheckoutPage() {
                 </h3>
 
                 <div className="space-y-4">
-                  {cart?.items?.map((item: any) => (
-                    <div key={item.id} className="flex items-center space-x-4">
-                      <div className="flex-1">
-                        <h4 className="text-sm font-medium text-gray-900">
-                          {item.title || item.product?.title || item.variant?.product?.title}
-                        </h4>
-                        <p className="text-sm text-gray-500">
-                          {item.variant?.title} × {item.quantity}
-                        </p>
+                  {cart?.items && cart.items.length > 0 ? (
+                    cart.items.map((item: any) => (
+                      <div key={item.id} className="flex items-center space-x-4">
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-900">
+                            {item.title || item.product?.title || item.variant?.product?.title}
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            {item.variant?.title} × {item.quantity}
+                          </p>
+                        </div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {formatPrice(item.subtotal || (item.unit_price * item.quantity))}
+                        </div>
                       </div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {formatPrice(item.subtotal || item.unit_price * item.quantity)}
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">Loading cart...</p>
+                  )}
 
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between text-base font-medium text-gray-900">
