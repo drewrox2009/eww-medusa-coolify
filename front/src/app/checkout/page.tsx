@@ -419,7 +419,7 @@ export default function CheckoutPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg min-w-[200px]"
+                        className="inline-flex items-center justify-center px-8 py-3 border border-black text-base font-medium rounded-full text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg min-w-[200px]"
                       >
                         {loading ? (
                           <>Saving...</>
