@@ -24,15 +24,14 @@ export default async function ProductsPage({
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-4">
               <span className="badge">
-                Explore compounds
+                Research Catalog
               </span>
               <div className="space-y-2">
                 <h1 className="text-3xl font-semibold text-black sm:text-4xl">
-                  Shop research compounds by category
+                  Browse Research Compounds
                 </h1>
                 <p className="max-w-xl text-base text-gray-600">
-                  Discover clinically vetted generics with transparent pricing,
-                  pharmacist guidance, and global shipping.
+                  Lab-tested compounds with transparent pricing and worldwide shipping
                 </p>
               </div>
             </div>
@@ -70,10 +69,10 @@ export default async function ProductsPage({
             ) : (
               <div className="card-surface flex flex-col items-center gap-4 px-10 py-12 text-center">
                 <p className="text-base font-semibold text-black">
-                  Try a different search to find additional compounds.
+                  No compounds found matching your search
                 </p>
                 <p className="text-sm text-gray-500">
-                  Try searching by condition name to browse the full catalog.
+                  Try a different search term or browse the full catalog
                 </p>
                 <Link
                   href="/products"

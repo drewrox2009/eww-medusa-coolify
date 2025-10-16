@@ -8,7 +8,7 @@ export default function AboutPage() {
               About Octochems
             </h1>
             <p className="mt-4 text-lg leading-8 text-gray-600">
-              Research-grade chemical compounds for scientific exploration and advancement.
+              Lab-tested compounds for researchers worldwide
             </p>
           </div>
 
@@ -19,15 +19,12 @@ export default function AboutPage() {
                 Our Mission
               </h2>
               <p className="text-gray-700 mb-6 leading-relaxed">
-                Octochems is dedicated to providing researchers, scientists, and institutions with
-                access to high-quality, research-grade chemical compounds. We prioritize purity,
-                transparency, and scientific integrity in everything we do, ensuring that our
-                products meet the rigorous standards required for legitimate research and development.
+                We provide researchers with access to quality compounds backed by third-party testing.
+                Every batch comes with certificates of analysis, ensuring you know exactly what you're working with.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                Our commitment extends beyond product quality to include comprehensive support for
-                the research community, including access to research documentation, expert guidance,
-                and a platform that fosters scientific discovery and advancement.
+                Beyond just products, we support the research community with documentation, guidance,
+                and a commitment to transparency at every step.
               </p>
             </div>
 
@@ -57,7 +54,7 @@ export default function AboutPage() {
                     Third-Party Testing
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Every batch undergoes independent laboratory analysis with certificates of analysis provided.
+                    Independent lab testing with COA documentation for every batch
                   </p>
                 </div>
 
@@ -81,7 +78,7 @@ export default function AboutPage() {
                     Research Documentation
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Access to research papers, usage guidelines, and safety documentation for all compounds.
+                    Research papers, usage guidelines, and safety data for all compounds
                   </p>
                 </div>
 
@@ -105,7 +102,7 @@ export default function AboutPage() {
                     Secure & Compliant
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Legal compliance and secure handling throughout the supply chain with privacy protection.
+                    Compliant handling and secure shipping with full privacy protection
                   </p>
                 </div>
               </div>
@@ -117,8 +114,7 @@ export default function AboutPage() {
                 Research Support
               </h2>
               <p className="text-gray-700 mb-6 leading-relaxed">
-                We believe in supporting the scientific community. Our platform provides more than just
-                products - we offer comprehensive research support including:
+                Supporting researchers with more than just products:
               </p>
               <ul className="space-y-3 text-gray-700">
                 <li className="flex items-start">
@@ -146,15 +142,14 @@ export default function AboutPage() {
                 Need Research Support?
               </h2>
               <p className="text-gray-700 mb-6">
-                Our team of research specialists is available to assist with your scientific inquiries
-                and provide guidance on compound selection and usage.
+                Our team is here to help with compound selection and answer your questions
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href="/contact"
                   className="inline-flex items-center justify-center rounded-md bg-black px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                 >
-                  Contact Research Support
+                  Get in Touch
                 </a>
                 <a
                   href="/products"

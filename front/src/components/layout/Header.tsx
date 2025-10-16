@@ -13,15 +13,15 @@ export default function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-3">
               <Image
                 src="/octochems_hex_no_bottom_text.svg"
                 alt="Octochems"
-                width={50}
-                height={50}
-                className="h-8 w-8"
+                width={64}
+                height={64}
+                className="h-12 w-12 sm:h-14 sm:w-14"
               />
-              <span className="text-xl font-bold text-black">Octochems</span>
+              <span className="text-xl sm:text-2xl font-bold text-black">Octochems</span>
             </Link>
           </div>
 
