@@ -12,13 +12,14 @@ import {
   linkSalesChannelsToApiKeyWorkflow,
   linkSalesChannelsToStockLocationWorkflow,
   updateStoresWorkflow,
-} from "@medusajs/medusa/core-flows";
-import { CreateInventoryLevelInput, ExecArgs } from "@medusajs/framework/types";
+  updateProductCategoriesWorkflow,
+} from "@medusajs/core-flows";
+import { CreateInventoryLevelInput, ExecArgs } from "@medusajs/types";
 import {
   ContainerRegistrationKeys,
   Modules,
   ProductStatus,
-} from "@medusajs/framework/utils";
+} from "@medusajs/utils";
 
 export default async function seedDemoData({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -28,7 +29,59 @@ export default async function seedDemoData({ container }: ExecArgs) {
   const salesChannelModuleService = container.resolve(Modules.SALES_CHANNEL);
   const storeModuleService = container.resolve(Modules.STORE);
 
-  const countries = ["gb", "de", "dk", "se", "fr", "es", "it"];
+  // US States for tax regions
+  const usStates = [
+    "al",
+    "ak",
+    "az",
+    "ar",
+    "ca",
+    "co",
+    "ct",
+    "de",
+    "fl",
+    "ga",
+    "hi",
+    "id",
+    "il",
+    "in",
+    "ia",
+    "ks",
+    "ky",
+    "la",
+    "me",
+    "md",
+    "ma",
+    "mi",
+    "mn",
+    "ms",
+    "mo",
+    "mt",
+    "ne",
+    "nv",
+    "nh",
+    "nj",
+    "nm",
+    "ny",
+    "nc",
+    "nd",
+    "oh",
+    "ok",
+    "or",
+    "pa",
+    "ri",
+    "sc",
+    "sd",
+    "tn",
+    "tx",
+    "ut",
+    "vt",
+    "va",
+    "wa",
+    "wv",
+    "wi",
+    "wy",
+  ];
 
   logger.info("Seeding store data...");
   const [store] = await storeModuleService.listStores();
@@ -58,25 +111,26 @@ export default async function seedDemoData({ container }: ExecArgs) {
       update: {
         supported_currencies: [
           {
-            currency_code: "eur",
+            currency_code: "usd",
             is_default: true,
           },
           {
-            currency_code: "usd",
+            currency_code: "eur",
           },
         ],
         default_sales_channel_id: defaultSalesChannel[0].id,
       },
     },
   });
+
   logger.info("Seeding region data...");
   const { result: regionResult } = await createRegionsWorkflow(container).run({
     input: {
       regions: [
         {
-          name: "Europe",
-          currency_code: "eur",
-          countries,
+          name: "United States",
+          currency_code: "usd",
+          countries: ["us"],
           payment_providers: ["pp_system_default"],
         },
       ],
@@ -87,8 +141,9 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
   logger.info("Seeding tax regions...");
   await createTaxRegionsWorkflow(container).run({
-    input: countries.map((country_code) => ({
-      country_code,
+    input: usStates.map((province_code) => ({
+      country_code: "us",
+      province_code,
     })),
   });
   logger.info("Finished seeding tax regions.");
@@ -100,11 +155,12 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       locations: [
         {
-          name: "European Warehouse",
+          name: "US Main Warehouse",
           address: {
-            city: "Copenhagen",
-            country_code: "DK",
-            address_1: "",
+            city: "New York",
+            country_code: "US",
+            address_1: "123 Research Blvd",
+            postal_code: "10001",
           },
         },
       ],
@@ -123,58 +179,34 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
   logger.info("Seeding fulfillment data...");
   const shippingProfiles = await fulfillmentModuleService.listShippingProfiles({
-    type: "default"
-  })
-  let shippingProfile = shippingProfiles.length ? shippingProfiles[0] : null
+    type: "default",
+  });
+  let shippingProfile = shippingProfiles.length ? shippingProfiles[0] : null;
 
   if (!shippingProfile) {
     const { result: shippingProfileResult } =
-    await createShippingProfilesWorkflow(container).run({
-      input: {
-        data: [
-          {
-            name: "Default Shipping Profile",
-            type: "default",
-          },
-        ],
-      },
-    });
+      await createShippingProfilesWorkflow(container).run({
+        input: {
+          data: [
+            {
+              name: "Default Shipping Profile",
+              type: "default",
+            },
+          ],
+        },
+      });
     shippingProfile = shippingProfileResult[0];
   }
 
   const fulfillmentSet = await fulfillmentModuleService.createFulfillmentSets({
-    name: "European Warehouse delivery",
+    name: "US Main Warehouse delivery",
     type: "shipping",
     service_zones: [
       {
-        name: "Europe",
+        name: "United States",
         geo_zones: [
           {
-            country_code: "gb",
-            type: "country",
-          },
-          {
-            country_code: "de",
-            type: "country",
-          },
-          {
-            country_code: "dk",
-            type: "country",
-          },
-          {
-            country_code: "se",
-            type: "country",
-          },
-          {
-            country_code: "fr",
-            type: "country",
-          },
-          {
-            country_code: "es",
-            type: "country",
-          },
-          {
-            country_code: "it",
+            country_code: "us",
             type: "country",
           },
         ],
@@ -201,21 +233,21 @@ export default async function seedDemoData({ container }: ExecArgs) {
         shipping_profile_id: shippingProfile.id,
         type: {
           label: "Standard",
-          description: "Ship in 2-3 days.",
+          description: "Ship in 5-7 business days.",
           code: "standard",
         },
         prices: [
           {
             currency_code: "usd",
-            amount: 10,
+            amount: 15,
           },
           {
             currency_code: "eur",
-            amount: 10,
+            amount: 20,
           },
           {
             region_id: region.id,
-            amount: 10,
+            amount: 15,
           },
         ],
         rules: [
@@ -239,21 +271,21 @@ export default async function seedDemoData({ container }: ExecArgs) {
         shipping_profile_id: shippingProfile.id,
         type: {
           label: "Express",
-          description: "Ship in 24 hours.",
+          description: "Ship in 2-3 business days.",
           code: "express",
         },
         prices: [
           {
             currency_code: "usd",
-            amount: 10,
+            amount: 35,
           },
           {
             currency_code: "eur",
-            amount: 10,
+            amount: 45,
           },
           {
             region_id: region.id,
-            amount: 10,
+            amount: 35,
           },
         ],
         rules: [
@@ -288,7 +320,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
     input: {
       api_keys: [
         {
-          title: "Webshop",
+          title: "Research Chemicals Store",
           type: "publishable",
           created_by: "",
         },
@@ -307,211 +339,146 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
   logger.info("Seeding product data...");
 
-  const { result: categoryResult } = await createProductCategoriesWorkflow(
+  // Create parent category first
+  const { result: parentCategoryResult } =
+    await createProductCategoriesWorkflow(container).run({
+      input: {
+        product_categories: [
+          {
+            name: "Research Chemicals",
+            is_active: true,
+          },
+        ],
+      },
+    });
+
+  const parentCategory = parentCategoryResult[0];
+
+  // Create subcategories
+  const { result: subcategoryResult } = await createProductCategoriesWorkflow(
     container
   ).run({
     input: {
       product_categories: [
         {
-          name: "Shirts",
+          name: "Psychedelic Compounds",
           is_active: true,
+          parent_category_id: parentCategory.id,
         },
         {
-          name: "Sweatshirts",
+          name: "Serotonergic Agents",
           is_active: true,
+          parent_category_id: parentCategory.id,
         },
         {
-          name: "Pants",
+          name: "Neurological Research",
           is_active: true,
+          parent_category_id: parentCategory.id,
         },
         {
-          name: "Merch",
+          name: "CNS Modulators",
           is_active: true,
+          parent_category_id: parentCategory.id,
         },
       ],
     },
   });
 
+  // Combine all categories
+  const categoryResult = [...parentCategoryResult, ...subcategoryResult];
+
   await createProductsWorkflow(container).run({
     input: {
       products: [
         {
-          title: "Medusa T-Shirt",
+          title: "Imidanezil",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Shirts")!.id,
+            categoryResult.find((cat) => cat.name === "Psychedelic Compounds")!
+              .id,
           ],
           description:
-            "Reimagine the feeling of a classic T-shirt. With our cotton T-shirts, everyday essentials no longer have to be ordinary.",
-          handle: "t-shirt",
-          weight: 400,
+            "Imidanezil is a novel research compound belonging to the imidazoline class of chemicals. This compound exhibits unique binding properties at imidazoline receptors and shows potential for neuropharmacological research. Imidanezil has demonstrated interesting effects on cognitive function and neuroprotection in preliminary studies. This compound is intended strictly for research purposes in controlled laboratory settings and should be handled with appropriate safety protocols.",
+          handle: "imidanezil",
+          weight: 100,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
           images: [
             {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-back.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-white-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-white-back.png",
+              url: "https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=131632928&t=l",
             },
           ],
           options: [
             {
-              title: "Size",
-              values: ["S", "M", "L", "XL"],
-            },
-            {
-              title: "Color",
-              values: ["Black", "White"],
+              title: "Quantity",
+              values: ["1g", "5g", "10g", "20g"],
             },
           ],
           variants: [
             {
-              title: "S / Black",
-              sku: "SHIRT-S-BLACK",
+              title: "1g",
+              sku: "IMD-1G",
               options: {
-                Size: "S",
-                Color: "Black",
+                Quantity: "1g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 45,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 55,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "S / White",
-              sku: "SHIRT-S-WHITE",
+              title: "5g",
+              sku: "IMD-5G",
               options: {
-                Size: "S",
-                Color: "White",
+                Quantity: "5g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 180,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 220,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "M / Black",
-              sku: "SHIRT-M-BLACK",
+              title: "10g",
+              sku: "IMD-10G",
               options: {
-                Size: "M",
-                Color: "Black",
+                Quantity: "10g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 320,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 390,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "M / White",
-              sku: "SHIRT-M-WHITE",
+              title: "20g",
+              sku: "IMD-20G",
               options: {
-                Size: "M",
-                Color: "White",
+                Quantity: "20g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
+                  amount: 580,
                   currency_code: "usd",
                 },
-              ],
-            },
-            {
-              title: "L / Black",
-              sku: "SHIRT-L-BLACK",
-              options: {
-                Size: "L",
-                Color: "Black",
-              },
-              prices: [
                 {
-                  amount: 10,
+                  amount: 710,
                   currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "L / White",
-              sku: "SHIRT-L-WHITE",
-              options: {
-                Size: "L",
-                Color: "White",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "XL / Black",
-              sku: "SHIRT-XL-BLACK",
-              options: {
-                Size: "XL",
-                Color: "Black",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
-                },
-              ],
-            },
-            {
-              title: "XL / White",
-              sku: "SHIRT-XL-WHITE",
-              options: {
-                Size: "XL",
-                Color: "White",
-              },
-              prices: [
-                {
-                  amount: 10,
-                  currency_code: "eur",
-                },
-                {
-                  amount: 15,
-                  currency_code: "usd",
                 },
               ],
             },
@@ -523,96 +490,94 @@ export default async function seedDemoData({ container }: ExecArgs) {
           ],
         },
         {
-          title: "Medusa Sweatshirt",
+          title: "Fenfluramine",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Sweatshirts")!.id,
+            categoryResult.find((cat) => cat.name === "Serotonergic Agents")!
+              .id,
           ],
           description:
-            "Reimagine the feeling of a classic sweatshirt. With our cotton sweatshirt, everyday essentials no longer have to be ordinary.",
-          handle: "sweatshirt",
-          weight: 400,
+            "Fenfluramine is a serotonergic agent that functions as a serotonin releasing agent and reuptake inhibitor. This compound has been extensively studied for its effects on serotonin neurotransmission and appetite regulation. Fenfluramine demonstrates high affinity for serotonin transporters and 5-HT2 receptors, making it valuable for research into serotonergic pathways. This compound is intended for research purposes only and should be handled with appropriate safety precautions in laboratory environments.",
+          handle: "fenfluramine",
+          weight: 100,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
           images: [
             {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-back.png",
+              url: "https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=3334&t=l",
             },
           ],
           options: [
             {
-              title: "Size",
-              values: ["S", "M", "L", "XL"],
+              title: "Quantity",
+              values: ["1g", "5g", "10g", "20g"],
             },
           ],
           variants: [
             {
-              title: "S",
-              sku: "SWEATSHIRT-S",
+              title: "1g",
+              sku: "FEN-1G",
               options: {
-                Size: "S",
+                Quantity: "1g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 35,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 42,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "M",
-              sku: "SWEATSHIRT-M",
+              title: "5g",
+              sku: "FEN-5G",
               options: {
-                Size: "M",
+                Quantity: "5g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 140,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 170,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "L",
-              sku: "SWEATSHIRT-L",
+              title: "10g",
+              sku: "FEN-10G",
               options: {
-                Size: "L",
+                Quantity: "10g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 250,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 305,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "XL",
-              sku: "SWEATSHIRT-XL",
+              title: "20g",
+              sku: "FEN-20G",
               options: {
-                Size: "XL",
+                Quantity: "20g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 450,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 550,
+                  currency_code: "eur",
                 },
               ],
             },
@@ -624,96 +589,94 @@ export default async function seedDemoData({ container }: ExecArgs) {
           ],
         },
         {
-          title: "Medusa Sweatpants",
+          title: "Irdabisant",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Pants")!.id,
+            categoryResult.find((cat) => cat.name === "Neurological Research")!
+              .id,
           ],
           description:
-            "Reimagine the feeling of classic sweatpants. With our cotton sweatpants, everyday essentials no longer have to be ordinary.",
-          handle: "sweatpants",
-          weight: 400,
+            "Irdabisant is a novel research compound that acts as a selective antagonist at specific neurotransmitter receptors. This compound has shown promise in neurological research for its ability to modulate neural signaling pathways. Irdabisant demonstrates high specificity for its target receptors with minimal off-target activity, making it valuable for mechanistic studies. This compound is intended strictly for in vitro research applications and should be handled following standard laboratory safety protocols.",
+          handle: "irdabisant",
+          weight: 100,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
           images: [
             {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-back.png",
+              url: "https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=118976548&t=l",
             },
           ],
           options: [
             {
-              title: "Size",
-              values: ["S", "M", "L", "XL"],
+              title: "Quantity",
+              values: ["1g", "5g", "10g", "20g"],
             },
           ],
           variants: [
             {
-              title: "S",
-              sku: "SWEATPANTS-S",
+              title: "1g",
+              sku: "IRD-1G",
               options: {
-                Size: "S",
+                Quantity: "1g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 55,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 67,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "M",
-              sku: "SWEATPANTS-M",
+              title: "5g",
+              sku: "IRD-5G",
               options: {
-                Size: "M",
+                Quantity: "5g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 220,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 270,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "L",
-              sku: "SWEATPANTS-L",
+              title: "10g",
+              sku: "IRD-10G",
               options: {
-                Size: "L",
+                Quantity: "10g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 390,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 475,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "XL",
-              sku: "SWEATPANTS-XL",
+              title: "20g",
+              sku: "IRD-20G",
               options: {
-                Size: "XL",
+                Quantity: "20g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 700,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 855,
+                  currency_code: "eur",
                 },
               ],
             },
@@ -725,96 +688,388 @@ export default async function seedDemoData({ container }: ExecArgs) {
           ],
         },
         {
-          title: "Medusa Shorts",
+          title: "SR-17018",
           category_ids: [
-            categoryResult.find((cat) => cat.name === "Merch")!.id,
+            categoryResult.find((cat) => cat.name === "CNS Modulators")!.id,
           ],
           description:
-            "Reimagine the feeling of classic shorts. With our cotton shorts, everyday essentials no longer have to be ordinary.",
-          handle: "shorts",
-          weight: 400,
+            "SR-17018 is a novel research compound that functions as a biased agonist at opioid receptors. This compound exhibits unique pharmacological properties, preferentially activating G-protein signaling pathways while minimizing β-arrestin recruitment. SR-17018 has shown potential for analgesic research with reduced side effects in preclinical studies. This compound is intended for research purposes only and should be handled with extreme caution following all applicable safety regulations.",
+          handle: "sr-17018",
+          weight: 100,
           status: ProductStatus.PUBLISHED,
           shipping_profile_id: shippingProfile.id,
           images: [
             {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-front.png",
-            },
-            {
-              url: "https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-back.png",
+              url: "https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=129711842&t=l",
             },
           ],
           options: [
             {
-              title: "Size",
-              values: ["S", "M", "L", "XL"],
+              title: "Quantity",
+              values: ["1g", "5g", "10g", "20g"],
             },
           ],
           variants: [
             {
-              title: "S",
-              sku: "SHORTS-S",
+              title: "1g",
+              sku: "SR17018-1G",
               options: {
-                Size: "S",
+                Quantity: "1g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 65,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 79,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "M",
-              sku: "SHORTS-M",
+              title: "5g",
+              sku: "SR17018-5G",
               options: {
-                Size: "M",
+                Quantity: "5g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 260,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 318,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "L",
-              sku: "SHORTS-L",
+              title: "10g",
+              sku: "SR17018-10G",
               options: {
-                Size: "L",
+                Quantity: "10g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 460,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
-                  currency_code: "usd",
+                  amount: 562,
+                  currency_code: "eur",
                 },
               ],
             },
             {
-              title: "XL",
-              sku: "SHORTS-XL",
+              title: "20g",
+              sku: "SR17018-20G",
               options: {
-                Size: "XL",
+                Quantity: "20g",
               },
               prices: [
                 {
-                  amount: 10,
-                  currency_code: "eur",
+                  amount: 820,
+                  currency_code: "usd",
                 },
                 {
-                  amount: 15,
+                  amount: 1000,
+                  currency_code: "eur",
+                },
+              ],
+            },
+          ],
+          sales_channels: [
+            {
+              id: defaultSalesChannel[0].id,
+            },
+          ],
+        },
+        {
+          title: "Seladepar",
+          category_ids: [
+            categoryResult.find((cat) => cat.name === "Neurological Research")!
+              .id,
+          ],
+          description:
+            "Seladepar is a research compound that acts as a selective monoamine oxidase inhibitor (MAOI) with potential neuroprotective properties. This compound has demonstrated interesting effects on neurotransmitter metabolism and oxidative stress pathways in preliminary research. Seladepar shows promise for studies into neurodegenerative conditions and cognitive enhancement. This compound is intended strictly for research applications and should be handled following appropriate laboratory safety protocols.",
+          handle: "seladepar",
+          weight: 100,
+          status: ProductStatus.PUBLISHED,
+          shipping_profile_id: shippingProfile.id,
+          images: [
+            {
+              url: "https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=9838209&t=l",
+            },
+          ],
+          options: [
+            {
+              title: "Quantity",
+              values: ["1g", "5g", "10g", "20g"],
+            },
+          ],
+          variants: [
+            {
+              title: "1g",
+              sku: "SEL-1G",
+              options: {
+                Quantity: "1g",
+              },
+              prices: [
+                {
+                  amount: 50,
                   currency_code: "usd",
+                },
+                {
+                  amount: 61,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "5g",
+              sku: "SEL-5G",
+              options: {
+                Quantity: "5g",
+              },
+              prices: [
+                {
+                  amount: 200,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 244,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "10g",
+              sku: "SEL-10G",
+              options: {
+                Quantity: "10g",
+              },
+              prices: [
+                {
+                  amount: 350,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 427,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "20g",
+              sku: "SEL-20G",
+              options: {
+                Quantity: "20g",
+              },
+              prices: [
+                {
+                  amount: 620,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 758,
+                  currency_code: "eur",
+                },
+              ],
+            },
+          ],
+          sales_channels: [
+            {
+              id: defaultSalesChannel[0].id,
+            },
+          ],
+        },
+        {
+          title: "Esmirtazapine",
+          category_ids: [
+            categoryResult.find((cat) => cat.name === "CNS Modulators")!.id,
+          ],
+          description:
+            "Esmirtazapine is a research compound that functions as an antagonist at multiple neurotransmitter receptors, including serotonergic and adrenergic receptors. This compound exhibits a unique pharmacological profile that makes it valuable for research into sleep regulation, mood disorders, and neurochemical pathways. Esmirtazapine has shown promise in preliminary studies for its effects on sleep architecture and circadian rhythms. This compound is intended for research purposes only and should be handled following standard laboratory safety procedures.",
+          handle: "esmirtazapine",
+          weight: 100,
+          status: ProductStatus.PUBLISHED,
+          shipping_profile_id: shippingProfile.id,
+          images: [
+            {
+              url: "https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=9838210&t=l",
+            },
+          ],
+          options: [
+            {
+              title: "Quantity",
+              values: ["1g", "5g", "10g", "20g"],
+            },
+          ],
+          variants: [
+            {
+              title: "1g",
+              sku: "ESM-1G",
+              options: {
+                Quantity: "1g",
+              },
+              prices: [
+                {
+                  amount: 42,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 51,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "5g",
+              sku: "ESM-5G",
+              options: {
+                Quantity: "5g",
+              },
+              prices: [
+                {
+                  amount: 168,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 205,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "10g",
+              sku: "ESM-10G",
+              options: {
+                Quantity: "10g",
+              },
+              prices: [
+                {
+                  amount: 295,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 360,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "20g",
+              sku: "ESM-20G",
+              options: {
+                Quantity: "20g",
+              },
+              prices: [
+                {
+                  amount: 520,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 635,
+                  currency_code: "eur",
+                },
+              ],
+            },
+          ],
+          sales_channels: [
+            {
+              id: defaultSalesChannel[0].id,
+            },
+          ],
+        },
+        {
+          title: "Vorinostat",
+          category_ids: [
+            categoryResult.find((cat) => cat.name === "Research Chemicals")!.id,
+          ],
+          description:
+            "Vorinostat is a histone deacetylase (HDAC) inhibitor that has been extensively studied for its effects on gene expression and cellular differentiation. This compound demonstrates potent inhibition of class I and II HDAC enzymes, making it valuable for epigenetics research and studies into transcriptional regulation. Vorinostat has shown particular promise in cancer research and studies of cellular differentiation pathways. This compound is intended for research purposes only and should be handled with appropriate safety precautions in laboratory settings.",
+          handle: "vorinostat",
+          weight: 100,
+          status: ProductStatus.PUBLISHED,
+          shipping_profile_id: shippingProfile.id,
+          images: [
+            {
+              url: "https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=5319&t=l",
+            },
+          ],
+          options: [
+            {
+              title: "Quantity",
+              values: ["1g", "5g", "10g", "20g"],
+            },
+          ],
+          variants: [
+            {
+              title: "1g",
+              sku: "VOR-1G",
+              options: {
+                Quantity: "1g",
+              },
+              prices: [
+                {
+                  amount: 38,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 46,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "5g",
+              sku: "VOR-5G",
+              options: {
+                Quantity: "5g",
+              },
+              prices: [
+                {
+                  amount: 152,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 186,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "10g",
+              sku: "VOR-10G",
+              options: {
+                Quantity: "10g",
+              },
+              prices: [
+                {
+                  amount: 265,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 324,
+                  currency_code: "eur",
+                },
+              ],
+            },
+            {
+              title: "20g",
+              sku: "VOR-20G",
+              options: {
+                Quantity: "20g",
+              },
+              prices: [
+                {
+                  amount: 470,
+                  currency_code: "usd",
+                },
+                {
+                  amount: 575,
+                  currency_code: "eur",
                 },
               ],
             },
@@ -841,7 +1096,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   for (const inventoryItem of inventoryItems) {
     const inventoryLevel = {
       location_id: stockLocation.id,
-      stocked_quantity: 1000000,
+      stocked_quantity: 100000,
       inventory_item_id: inventoryItem.id,
     };
     inventoryLevels.push(inventoryLevel);

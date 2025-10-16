@@ -33,6 +33,7 @@ ARG S3_SECRET_ACCESS_KEY
 ARG S3_REGION
 ARG S3_BUCKET
 ARG S3_ENDPOINT
+ARG RUN_SEED
 
 ENV COOKIE_SECRET=${COOKIE_SECRET}
 ENV JWT_SECRET=${JWT_SECRET}
@@ -51,6 +52,7 @@ ENV S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
 ENV S3_REGION=${S3_REGION}
 ENV S3_BUCKET=${S3_BUCKET}
 ENV S3_ENDPOINT=${S3_ENDPOINT}
+ENV RUN_SEED=${RUN_SEED}
 
 RUN echo "${PORT}"
 
@@ -72,11 +74,25 @@ WORKDIR /app/medusa/.medusa/server
 RUN yarn install --production
 
 
-# RUN medusa migrations run 
+# RUN medusa migrations run
 COPY migrations.sh /app/medusa/.medusa/server/migrations.sh
 RUN chmod +x /app/medusa/.medusa/server/migrations.sh
 RUN /app/medusa/.medusa/server/migrations.sh
 
 RUN rm /app/medusa/.medusa/server/migrations.sh
+
+# Run seed script if RUN_SEED environment variable is set to "true"
+RUN if [ "$RUN_SEED" = "true" ]; then \
+    echo "RUN_SEED is set to 'true', but will run after container starts"; \
+  else \
+    echo "RUN_SEED is not set to 'true', skipping seed script during build."; \
+  fi
+
+# Add a script to run seed after startup
+COPY seed-script.sh /app/medusa/.medusa/server/seed-script.sh
+RUN chmod +x /app/medusa/.medusa/server/seed-script.sh
+
+# Modify the start command to check for seed script
+CMD ["sh", "-c", "if [ \"$RUN_SEED\" = \"true\" ]; then echo \"Waiting 10 seconds before running seed...\" && sleep 10 && /app/medusa/.medusa/server/seed-script.sh; else yarn start; fi"]
 
 CMD ["yarn", "run", "start"]
