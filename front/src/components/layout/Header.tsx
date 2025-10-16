@@ -15,7 +15,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Image
-                src="/octochems-logo.svg"
+                src="/octochems_hex_no_bottom_text.svg"
                 alt="Octochems"
                 width={50}
                 height={50}
