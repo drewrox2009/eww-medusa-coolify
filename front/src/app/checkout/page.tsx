@@ -79,10 +79,20 @@ export default function CheckoutPage() {
 
     try {
       setLoading(true);
-      await checkoutApi.updateShippingAddress(cartId, shippingAddress);
+      // Ensure country code is lowercase for Medusa
+      const addressToSubmit = {
+        ...shippingAddress,
+        country_code: shippingAddress.country_code.toLowerCase(),
+      };
+      await checkoutApi.updateShippingAddress(cartId, addressToSubmit);
       setStep("payment");
     } catch (error) {
       console.error("Failed to update shipping address:", error);
+      alert(
+        `Failed to update shipping address: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     } finally {
       setLoading(false);
     }
