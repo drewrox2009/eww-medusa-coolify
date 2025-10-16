@@ -34,7 +34,7 @@ export default function SearchBar({ initialQuery = "" }: SearchBarProps) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search medications by name or active ingredient..."
+          placeholder="Search all products..."
           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />
       </div>

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getProducts } from "@/lib/medusa/products";
 import ProductCard from "@/components/product/ProductCard";
-import ProductFilters from "@/components/product/ProductFilters";
 import SearchBar from "@/components/common/SearchBar";
 
 export default async function ProductsPage({
@@ -43,66 +42,48 @@ export default async function ProductsPage({
             </div>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
-            <aside className="card-surface h-full p-6">
-              <div className="space-y-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-black">
-                    Filter results
-                  </h2>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Refine by therapeutic class, dosage form, and other
-                    criteria.
-                  </p>
-                </div>
-                <ProductFilters />
-              </div>
-            </aside>
-
-            <main className="space-y-6">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm font-medium text-gray-600">
-                  {resultCount === 0
-                    ? "No compounds found"
-                    : `Showing ${resultCount} ${
-                        resultCount === 1 ? "compound" : "compounds"
-                      }`}
-                </p>
-                {params.q && (
-                  <Link
-                    href="/products"
-                    className="inline-flex items-center text-sm font-medium text-black hover:text-gray-800"
-                  >
-                    Reset search
-                  </Link>
-                )}
-              </div>
-
-              {resultCount > 0 ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {items.map((product: any) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
-              ) : (
-                <div className="card-surface flex flex-col items-center gap-4 px-10 py-12 text-center">
-                  <p className="text-base font-semibold text-black">
-                    Adjust your filters to find additional compounds.
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Try searching by condition name or remove filters to browse
-                    the full catalog.
-                  </p>
-                  <Link
-                    href="/products"
-                    className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-500"
-                  >
-                    View all compounds
-                  </Link>
-                </div>
+          <main className="space-y-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm font-medium text-gray-600">
+                {resultCount === 0
+                  ? "No compounds found"
+                  : `Showing ${resultCount} ${
+                      resultCount === 1 ? "compound" : "compounds"
+                    }`}
+              </p>
+              {params.q && (
+                <Link
+                  href="/products"
+                  className="inline-flex items-center text-sm font-medium text-black hover:text-gray-800"
+                >
+                  Reset search
+                </Link>
               )}
-            </main>
-          </div>
+            </div>
+
+            {resultCount > 0 ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {items.map((product: any) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="card-surface flex flex-col items-center gap-4 px-10 py-12 text-center">
+                <p className="text-base font-semibold text-black">
+                  Try a different search to find additional compounds.
+                </p>
+                <p className="text-sm text-gray-500">
+                  Try searching by condition name to browse the full catalog.
+                </p>
+                <Link
+                  href="/products"
+                  className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-500"
+                >
+                  View all compounds
+                </Link>
+              </div>
+            )}
+          </main>
         </div>
       </section>
     </div>
