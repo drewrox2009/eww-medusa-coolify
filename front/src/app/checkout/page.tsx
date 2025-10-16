@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, CreditCard, Truck, MapPin, Check, Bitcoin, Walle
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUserStore } from "@/lib/store/user-store";
 import * as checkoutApi from "@/lib/medusa/checkout";
+import { getCart } from "@/lib/medusa/cart";
 import { paymentManager } from "@/lib/payments/payment-manager";
 import type { PaymentProvider } from "@/lib/payments/types";
 import { formatPrice } from "@/lib/utils/format";
@@ -20,7 +21,8 @@ export default function CheckoutPage() {
     "shipping"
   );
   const [loading, setLoading] = useState(false);
-  const [checkoutData, setCheckoutData] = useState<any>(null);
+  const [cart, setCart] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [paymentProviders, setPaymentProviders] = useState<PaymentProvider[]>([]);
 
   const [shippingAddress, setShippingAddress] = useState({
@@ -44,8 +46,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Load checkout session and payment providers
-    loadCheckoutSession();
+    // Load cart data directly like the cart page does
+    loadCart();
     loadPaymentProviders();
   }, [cartId, itemCount, router]);
 
@@ -54,24 +56,19 @@ export default function CheckoutPage() {
     setPaymentProviders(providers);
   };
 
-  const loadCheckoutSession = async () => {
+  const loadCart = async () => {
     if (!cartId) return;
 
     try {
-      setLoading(true);
-      const data = await checkoutApi.createCheckoutSession(cartId);
-      console.log("Checkout data loaded:", data);
-      console.log("Items in cart:", (data?.cart as any)?.items);
-      setCheckoutData(data);
-      // Force re-render by setting state again after a delay
-      setTimeout(() => {
-        console.log("CheckoutData state after set:", checkoutData);
-        console.log("Current checkoutData in render:", checkoutData);
-      }, 100);
+      setIsLoading(true);
+      const cartData = await getCart(cartId);
+      console.log("Cart data loaded:", cartData);
+      console.log("Items in cart:", cartData?.cart?.items);
+      setCart(cartData);
     } catch (error) {
-      console.error("Failed to load checkout session:", error);
+      console.error("Failed to load cart:", error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -149,7 +146,7 @@ export default function CheckoutPage() {
     }));
   };
 
-  if (loading && !checkoutData) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
@@ -157,7 +154,7 @@ export default function CheckoutPage() {
     );
   }
 
-  if (!checkoutData) {
+  if (!cart) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -165,7 +162,7 @@ export default function CheckoutPage() {
             Checkout Unavailable
           </h2>
           <p className="text-gray-600 mb-6">
-            Unable to load checkout session. Please try again.
+            Unable to load cart. Please try again.
           </p>
           <Link
             href="/cart"
@@ -177,8 +174,6 @@ export default function CheckoutPage() {
       </div>
     );
   }
-
-  const { cart, paymentMethods } = checkoutData;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -571,8 +566,8 @@ export default function CheckoutPage() {
                 </h3>
 
                 <div className="space-y-4">
-                  {checkoutData?.cart?.items && (checkoutData.cart.items as any[]).length > 0 ? (
-                    (checkoutData.cart.items as any[]).map((item: any) => (
+                  {cart?.cart?.items && cart.cart.items.length > 0 ? (
+                    cart.cart.items.map((item: any) => (
                       <div key={item.id} className="flex items-center space-x-4">
                         <div className="flex-1">
                           <h4 className="text-sm font-medium text-gray-900">
@@ -594,13 +589,13 @@ export default function CheckoutPage() {
                         Cart ID: {cartId}
                       </p>
                       <p className="text-xs text-gray-400">
-                        Data loaded: {checkoutData ? 'Yes' : 'No'}
+                        Data loaded: {cart ? 'Yes' : 'No'}
                       </p>
                       <p className="text-xs text-gray-400">
-                        Items count: {(checkoutData?.cart as any)?.items?.length || 0}
+                        Items count: {cart?.cart?.items?.length || 0}
                       </p>
                       <p className="text-xs text-gray-400">
-                        Cart object: {checkoutData?.cart ? 'Exists' : 'Null'}
+                        Cart object: {cart?.cart ? 'Exists' : 'Null'}
                       </p>
                     </div>
                   )}
@@ -608,7 +603,7 @@ export default function CheckoutPage() {
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between text-base font-medium text-gray-900">
                       <span>Total</span>
-                      <span>{formatPrice((checkoutData?.cart as any)?.total || (checkoutData?.cart as any)?.subtotal || 0)}</span>
+                      <span>{formatPrice(cart?.cart?.total || cart?.cart?.subtotal || 0)}</span>
                     </div>
                   </div>
                 </div>
