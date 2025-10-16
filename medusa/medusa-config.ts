@@ -8,10 +8,7 @@ module.exports = defineConfig({
     redisUrl: process.env.REDIS_URL,
     workerMode: process.env.WORKER_MODE as "shared" | "worker" | "server",
     http: {
-      storeCors: {
-        origin: process.env.STORE_CORS!,
-        credentials: true,
-      },
+      storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
       authCors: process.env.AUTH_CORS!,
       jwtSecret: process.env.JWT_SECRET || "supersecret",

@@ -130,7 +130,8 @@ export default function CheckoutPage() {
 
         // For real payment providers, redirect to payment URL
         if (paymentSession.paymentUrl) {
-          window.location.href = paymentSession.paymentUrl;
+          // Redirect to our payment page instead of external URL
+          router.push(`/checkout/payment/${paymentSession.id}`);
         } else {
           throw new Error("Payment URL not provided");
         }

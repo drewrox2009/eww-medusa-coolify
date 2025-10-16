@@ -7,6 +7,7 @@ import { CheckCircle, XCircle, Clock, Loader2, Copy, ExternalLink } from "lucide
 import { paymentManager } from "@/lib/payments/payment-manager";
 import type { PaymentSession } from "@/lib/payments/types";
 import { formatPrice } from "@/lib/utils/format";
+import * as checkoutApi from "@/lib/medusa/checkout";
 
 export default function PaymentPage() {
   const router = useRouter();
@@ -42,8 +43,17 @@ export default function PaymentPage() {
       setPayment(paymentStatus);
       setLoading(false);
 
-      // If payment is completed, redirect to confirmation
+      // If payment is completed, complete the order and redirect to confirmation
       if (paymentStatus.status === "completed") {
+        try {
+          // Complete the order in Medusa
+          await checkoutApi.completeOrder(paymentStatus.orderId);
+          console.log("Order completed successfully:", paymentStatus.orderId);
+        } catch (completeError) {
+          console.error("Failed to complete order:", completeError);
+          // Continue with redirect even if completion fails
+        }
+
         setTimeout(() => {
           router.push(
             `/checkout/confirmation?order=${paymentStatus.orderId}&payment=${paymentId}`
