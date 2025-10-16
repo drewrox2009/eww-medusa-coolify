@@ -60,7 +60,7 @@ module.exports = defineConfig({
               bucket: process.env.S3_BUCKET,
               endpoint: process.env.S3_ENDPOINT,
               s3_force_path_style: true, // Try this instead of additional_client_config
-              signature_version: "v4",
+              // signature_version: "v4",
               // additional_client_config: {
               //   forcePathStyle: true,
               // },
