@@ -1,114 +1,41 @@
-import {
-  AbstractPaymentProvider,
-  PaymentProviderError,
-  PaymentProviderSessionResponse,
-  PaymentSessionStatus,
-  ProviderWebhookPayload,
-  WebhookActionResult,
-} from "@medusajs/framework/types";
-import { MedusaError } from "@medusajs/framework/utils";
+import { AbstractPaymentProvider } from "@medusajs/framework/utils";
+import { Logger } from "@medusajs/framework/types";
 
-class ManualPaymentProviderService extends AbstractPaymentProvider {
+type Options = {
+  name?: string;
+};
+
+type InjectedDependencies = {
+  logger: Logger;
+};
+
+class ManualPaymentProviderService extends AbstractPaymentProvider<Options> {
   static identifier = "manual";
+  protected logger_: Logger;
+  protected options_: Options;
 
-  async initiatePayment(
-    context: any
-  ): Promise<PaymentProviderError | PaymentProviderSessionResponse> {
-    const { amount, currency_code, context: paymentContext } = context;
+  constructor(container: InjectedDependencies, options: Options) {
+    super(container, options);
+    this.logger_ = container.logger;
+    this.options_ = options;
+  }
+
+  async initiatePayment(input: any): Promise<any> {
+    const { amount, currency_code, context } = input;
 
     return {
+      id: `manual_${Date.now()}`,
       data: {
-        id: `manual_${Date.now()}`,
         amount,
         currency_code,
         status: "pending",
-        ...paymentContext,
+        ...context,
       },
     };
   }
 
-  async authorizePayment(
-    paymentSessionData: Record<string, unknown>,
-    context: Record<string, unknown>
-  ): Promise<
-    PaymentProviderError | {
-      status: PaymentSessionStatus;
-      data: PaymentProviderSessionResponse["data"];
-    }
-  > {
-    return {
-      status: "authorized" as PaymentSessionStatus,
-      data: {
-        ...paymentSessionData,
-        status: "authorized",
-      },
-    };
-  }
-
-  async cancelPayment(
-    paymentSessionData: Record<string, unknown>
-  ): Promise<
-    PaymentProviderError | PaymentProviderSessionResponse["data"]
-  > {
-    return {
-      ...paymentSessionData,
-      status: "canceled",
-    };
-  }
-
-  async capturePayment(
-    paymentSessionData: Record<string, unknown>
-  ): Promise<
-    PaymentProviderError | PaymentProviderSessionResponse["data"]
-  > {
-    return {
-      ...paymentSessionData,
-      status: "captured",
-    };
-  }
-
-  async deletePayment(
-    paymentSessionData: Record<string, unknown>
-  ): Promise<
-    PaymentProviderError | PaymentProviderSessionResponse["data"]
-  > {
-    return {
-      ...paymentSessionData,
-      status: "deleted",
-    };
-  }
-
-  async getPaymentStatus(
-    paymentSessionData: Record<string, unknown>
-  ): Promise<PaymentSessionStatus> {
-    return (paymentSessionData.status as PaymentSessionStatus) || "pending";
-  }
-
-  async refundPayment(
-    paymentSessionData: Record<string, unknown>,
-    refundAmount: number
-  ): Promise<
-    PaymentProviderError | PaymentProviderSessionResponse["data"]
-  > {
-    return {
-      ...paymentSessionData,
-      status: "refunded",
-      refund_amount: refundAmount,
-    };
-  }
-
-  async retrievePayment(
-    paymentSessionData: Record<string, unknown>
-  ): Promise<
-    PaymentProviderError | PaymentProviderSessionResponse["data"]
-  > {
-    return paymentSessionData;
-  }
-
-  async updatePayment(
-    context: any
-  ): Promise<PaymentProviderError | PaymentProviderSessionResponse> {
-    const { amount, currency_code, data } = context;
+  async updatePayment(input: any): Promise<any> {
+    const { amount, currency_code, data } = input;
 
     return {
       data: {
@@ -119,12 +46,76 @@ class ManualPaymentProviderService extends AbstractPaymentProvider {
     };
   }
 
-  async getWebhookActionAndData(
-    payload: ProviderWebhookPayload["payload"]
-  ): Promise<WebhookActionResult> {
+  async authorizePayment(input: any): Promise<any> {
     return {
-      action: "not_supported",
+      status: "authorized",
+      data: {
+        ...input.data,
+        status: "authorized",
+      },
     };
+  }
+
+  async capturePayment(input: any): Promise<any> {
+    const externalId = input.data?.id;
+
+    return {
+      data: {
+        ...input.data,
+        id: externalId,
+        status: "captured",
+      },
+    };
+  }
+
+  async cancelPayment(input: any): Promise<any> {
+    return {
+      data: {
+        ...input.data,
+        status: "canceled",
+      },
+    };
+  }
+
+  async deletePayment(input: any): Promise<any> {
+    return {
+      data: {
+        ...input.data,
+        status: "deleted",
+      },
+    };
+  }
+
+  async refundPayment(input: any): Promise<any> {
+    return {
+      data: {
+        ...input.data,
+        status: "refunded",
+        refund_amount: input.amount,
+      },
+    };
+  }
+
+  async retrievePayment(input: any): Promise<any> {
+    return {
+      id: input.data?.id || "",
+      data: input.data || {},
+    };
+  }
+
+  async getPaymentStatus(input: any): Promise<any> {
+    const status = input.data?.status as string;
+
+    switch (status) {
+      case "authorized":
+        return { status: "authorized" };
+      case "captured":
+        return { status: "captured" };
+      case "canceled":
+        return { status: "canceled" };
+      default:
+        return { status: "pending" };
+    }
   }
 }
 
