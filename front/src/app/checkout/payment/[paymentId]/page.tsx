@@ -46,26 +46,9 @@ export default function PaymentPage() {
       // If payment is completed, complete the order and redirect to confirmation
       if (paymentStatus.status === "completed") {
         try {
-          // Complete the order in Medusa via our custom API
-          const response = await fetch(`${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/custom`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-publishable-api-key': process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY!,
-            },
-            body: JSON.stringify({
-              action: 'complete_payment',
-              cartId: paymentStatus.orderId,
-              paymentId: paymentId,
-            }),
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const result = await response.json();
-          console.log("Order completed successfully:", result.order.id);
+          // Complete the order using the Medusa SDK
+          const result = await checkoutApi.completeOrder(paymentStatus.orderId);
+          console.log("Order completed successfully:", result.orderId);
         } catch (completeError) {
           console.error("Failed to complete order:", completeError);
           // Continue with redirect even if completion fails

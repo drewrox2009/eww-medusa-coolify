@@ -113,15 +113,23 @@ export async function createPaymentSessions(cartId: string) {
 
 export async function completeOrder(cartId: string) {
   try {
-    // Complete the order
-    const order = await medusa.store.cart.complete(cartId);
+    // Complete the order using the proper Medusa SDK method
+    const result = await medusa.store.cart.complete(cartId);
 
-    return {
-      order,
-      orderId: order.id,
-      status: "completed",
-      confirmationNumber: `ORD-${order.id.slice(-8).toUpperCase()}`,
-    };
+    // Handle the response structure properly
+    if (result.type === "order" && result.order) {
+      return {
+        order: result.order,
+        orderId: result.order.id,
+        status: "completed",
+        confirmationNumber: `ORD-${result.order.id.slice(-8).toUpperCase()}`,
+      };
+    } else if (result.type === "cart" && result.cart) {
+      // Error occurred
+      throw new Error(result.error?.message || "Failed to complete order");
+    } else {
+      throw new Error("Unexpected response from order completion");
+    }
   } catch (error) {
     console.error("Complete order error:", error);
     throw error;
