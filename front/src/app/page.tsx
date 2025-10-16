@@ -239,53 +239,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-2 mb-4">
-                <Image
-                  src="/octochems-logo.svg"
-                  alt="Octochems"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 brightness-0 invert"
-                />
-                <span className="text-xl font-bold text-white">Octochems</span>
-              </div>
-              <p className="text-sm text-gray-400 max-w-md">
-                Research-grade chemical compounds for scientific exploration.
-                Quality-verified with transparent sourcing and discreet worldwide shipping.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-semibold text-white mb-4">Products</h3>
-              <ul className="space-y-2">
-                <li><Link href="/products" className="text-sm text-gray-400 hover:text-white">All Compounds</Link></li>
-                <li><Link href="/categories" className="text-sm text-gray-400 hover:text-white">Categories</Link></li>
-                <li><Link href="/about" className="text-sm text-gray-400 hover:text-white">Quality Standards</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-semibold text-white mb-4">Support</h3>
-              <ul className="space-y-2">
-                <li><Link href="/contact" className="text-sm text-gray-400 hover:text-white">Contact</Link></li>
-                <li><Link href="/shipping" className="text-sm text-gray-400 hover:text-white">Shipping</Link></li>
-                <li><Link href="/returns" className="text-sm text-gray-400 hover:text-white">Returns</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-gray-800">
-            <p className="text-sm text-gray-400 text-center">
-              © 2025 Octochems. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
