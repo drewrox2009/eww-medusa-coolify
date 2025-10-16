@@ -285,13 +285,13 @@ export default function CartPage() {
                 <div className="space-y-3">
                   <Link
                     href="/checkout"
-                    className="inline-flex w-full items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-500"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-black px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 border border-black"
                   >
                     Proceed to secure checkout
                   </Link>
                   <Link
                     href="/products"
-                    className="inline-flex w-full items-center justify-center rounded-full border border-primary-200 bg-white px-6 py-3 text-sm font-semibold text-primary-700 transition hover:border-primary-300 hover:bg-primary-50"
+                    className="inline-flex w-full items-center justify-center rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-black transition hover:border-gray-400 hover:bg-gray-50"
                   >
                     Continue shopping
                   </Link>
