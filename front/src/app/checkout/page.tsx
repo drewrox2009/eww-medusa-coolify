@@ -61,7 +61,13 @@ export default function CheckoutPage() {
       setLoading(true);
       const data = await checkoutApi.createCheckoutSession(cartId);
       console.log("Checkout data loaded:", data);
+      console.log("Items in cart:", (data?.cart as any)?.items);
       setCheckoutData(data);
+      // Force re-render by setting state again after a delay
+      setTimeout(() => {
+        console.log("CheckoutData state after set:", checkoutData);
+        console.log("Current checkoutData in render:", checkoutData);
+      }, 100);
     } catch (error) {
       console.error("Failed to load checkout session:", error);
     } finally {
@@ -565,8 +571,8 @@ export default function CheckoutPage() {
                 </h3>
 
                 <div className="space-y-4">
-                  {checkoutData?.cart?.items && checkoutData.cart.items.length > 0 ? (
-                    checkoutData.cart.items.map((item: any) => (
+                  {checkoutData?.cart?.items && (checkoutData.cart.items as any[]).length > 0 ? (
+                    (checkoutData.cart.items as any[]).map((item: any) => (
                       <div key={item.id} className="flex items-center space-x-4">
                         <div className="flex-1">
                           <h4 className="text-sm font-medium text-gray-900">
@@ -591,7 +597,10 @@ export default function CheckoutPage() {
                         Data loaded: {checkoutData ? 'Yes' : 'No'}
                       </p>
                       <p className="text-xs text-gray-400">
-                        Items count: {checkoutData?.cart?.items?.length || 0}
+                        Items count: {(checkoutData?.cart as any)?.items?.length || 0}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Cart object: {checkoutData?.cart ? 'Exists' : 'Null'}
                       </p>
                     </div>
                   )}
@@ -599,7 +608,7 @@ export default function CheckoutPage() {
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between text-base font-medium text-gray-900">
                       <span>Total</span>
-                      <span>{formatPrice(checkoutData?.cart?.total || checkoutData?.cart?.subtotal || 0)}</span>
+                      <span>{formatPrice((checkoutData?.cart as any)?.total || (checkoutData?.cart as any)?.subtotal || 0)}</span>
                     </div>
                   </div>
                 </div>
