@@ -33,7 +33,7 @@ export default function CheckoutPage() {
     city: "",
     province: "",
     postal_code: "",
-    country_code: "US",
+    country_code: "us",
     phone: user?.phone || "",
   });
 
