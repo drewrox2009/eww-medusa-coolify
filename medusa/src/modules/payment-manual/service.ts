@@ -117,6 +117,13 @@ class ManualPaymentProviderService extends AbstractPaymentProvider<Options> {
         return { status: "pending" };
     }
   }
+
+  async getWebhookActionAndData(payload: any): Promise<any> {
+    // Manual payment provider doesn't use webhooks
+    return {
+      action: "not_supported",
+    };
+  }
 }
 
 export default ManualPaymentProviderService;
