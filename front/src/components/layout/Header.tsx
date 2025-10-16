@@ -17,8 +17,8 @@ export default function Header() {
               <Image
                 src="/octochems-logo.svg"
                 alt="Octochems"
-                width={32}
-                height={32}
+                width={50}
+                height={50}
                 className="h-8 w-8"
               />
               <span className="text-xl font-bold text-black">Octochems</span>
