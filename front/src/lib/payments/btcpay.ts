@@ -253,6 +253,7 @@ export class BTCPayProvider implements PaymentProviderService {
 
   /**
    * Verify webhook signature
+   * Note: This should only be called server-side (in API routes)
    */
   verifyWebhookSignature(payload: string, signature: string): boolean {
     if (!this.config.webhookSecret) {
@@ -260,34 +261,10 @@ export class BTCPayProvider implements PaymentProviderService {
       return false;
     }
 
-    try {
-      // BTCPay uses HMAC-SHA256 with format "sha256=<signature>"
-      const signatureParts = signature.split('=');
-      if (signatureParts.length !== 2 || signatureParts[0] !== 'sha256') {
-        console.error('Invalid BTCPay signature format');
-        return false;
-      }
-
-      // Use Node.js crypto for server-side verification
-      if (typeof window === 'undefined') {
-        const crypto = require('crypto');
-        const hmac = crypto.createHmac('sha256', this.config.webhookSecret);
-        hmac.update(payload);
-        const expectedSignature = hmac.digest('hex');
-        
-        return crypto.timingSafeEqual(
-          Buffer.from(signatureParts[1]),
-          Buffer.from(expectedSignature)
-        );
-      }
-      
-      // Client-side: cannot verify securely, return false
-      console.warn('Webhook verification should be done server-side');
-      return false;
-    } catch (error) {
-      console.error('BTCPay webhook verification error:', error);
-      return false;
-    }
+    // Webhook verification is handled in the API route
+    // This method is kept for interface compatibility
+    console.warn('Webhook verification should be done in API routes, not in client code');
+    return false;
   }
 }
 

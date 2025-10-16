@@ -311,6 +311,7 @@ export class ShkeeperProvider implements PaymentProviderService {
 
   /**
    * Validate webhook signature
+   * Note: This should only be called server-side (in API routes)
    */
   validateWebhookSignature(payload: string, signature: string): boolean {
     if (!this.config.secretKey) {
@@ -318,27 +319,10 @@ export class ShkeeperProvider implements PaymentProviderService {
       return false;
     }
 
-    try {
-      // Use Node.js crypto for server-side verification
-      if (typeof window === 'undefined') {
-        const crypto = require('crypto');
-        const hmac = crypto.createHmac('sha256', this.config.secretKey);
-        hmac.update(payload);
-        const expectedSignature = hmac.digest('hex');
-        
-        return crypto.timingSafeEqual(
-          Buffer.from(signature),
-          Buffer.from(expectedSignature)
-        );
-      }
-      
-      // Client-side: cannot verify securely, return false
-      console.warn('Webhook verification should be done server-side');
-      return false;
-    } catch (error) {
-      console.error("Shkeeper webhook validation error:", error);
-      return false;
-    }
+    // Webhook verification is handled in the API route
+    // This method is kept for interface compatibility
+    console.warn('Webhook verification should be done in API routes, not in client code');
+    return false;
   }
 
   /**

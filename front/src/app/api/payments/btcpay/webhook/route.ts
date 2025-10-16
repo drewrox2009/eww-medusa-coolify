@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyBTCPaySignature } from "@/lib/payments/crypto-utils";
+import crypto from "crypto";
 
 /**
  * BTCPay Server Webhook Handler
@@ -32,8 +32,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify the signature
-    const isValid = verifyBTCPaySignature(rawBody, signature, webhookSecret);
+    // Verify the signature - BTCPay format: "sha256=<signature>"
+    const signatureParts = signature.split('=');
+    if (signatureParts.length !== 2 || signatureParts[0] !== 'sha256') {
+      console.error("[BTCPay Webhook] Invalid signature format");
+      return NextResponse.json(
+        { error: "Invalid signature format" },
+        { status: 401 }
+      );
+    }
+
+    const hmac = crypto.createHmac('sha256', webhookSecret);
+    hmac.update(rawBody);
+    const expectedSignature = hmac.digest('hex');
+    
+    const isValid = crypto.timingSafeEqual(
+      Buffer.from(signatureParts[1]),
+      Buffer.from(expectedSignature)
+    );
+
     if (!isValid) {
       console.error("[BTCPay Webhook] Invalid signature");
       return NextResponse.json(
@@ -77,41 +94,14 @@ export async function POST(request: NextRequest) {
       
       case "InvoiceProcessing":
         console.log(`[BTCPay Webhook] Invoice ${invoiceId} processing`);
-        
-        // TODO: Update order status to processing
-        // await updateOrderPaymentStatus(orderId, "processing", {
-        //   paymentId: invoiceId,
-        //   provider: "btcpay",
-        //   status: "processing",
-        // });
-        
         break;
       
       case "InvoiceExpired":
         console.log(`[BTCPay Webhook] Invoice ${invoiceId} expired`);
-        
-        // TODO: Update order status to expired
-        // await updateOrderPaymentStatus(orderId, "expired", {
-        //   paymentId: invoiceId,
-        //   provider: "btcpay",
-        //   status: "expired",
-        // });
-        
-        // TODO: Send expiration notification
-        // await sendPaymentExpirationEmail(orderId);
-        
         break;
       
       case "InvoiceInvalid":
         console.log(`[BTCPay Webhook] Invoice ${invoiceId} invalid`);
-        
-        // TODO: Update order status to failed
-        // await updateOrderPaymentStatus(orderId, "failed", {
-        //   paymentId: invoiceId,
-        //   provider: "btcpay",
-        //   status: "invalid",
-        // });
-        
         break;
       
       default:

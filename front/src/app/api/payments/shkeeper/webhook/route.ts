@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyShkeeperSignature } from "@/lib/payments/crypto-utils";
+import crypto from "crypto";
 
 /**
  * Shkeeper Webhook Handler
@@ -33,7 +33,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the signature
-    const isValid = verifyShkeeperSignature(rawBody, signature, webhookSecret);
+    const hmac = crypto.createHmac('sha256', webhookSecret);
+    hmac.update(rawBody);
+    const expectedSignature = hmac.digest('hex');
+    
+    const isValid = crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(expectedSignature)
+    );
+
     if (!isValid) {
       console.error("[Shkeeper Webhook] Invalid signature");
       return NextResponse.json(
@@ -48,7 +56,7 @@ export async function POST(request: NextRequest) {
       external_id: orderId,
       status,
       amount,
-      crypto,
+      crypto: cryptoCurrency,
       fiat,
       tx_hash: txHash,
       wallet,
@@ -68,31 +76,11 @@ export async function POST(request: NextRequest) {
       case "completed":
         paymentStatus = "completed";
         orderStatus = "paid";
-        
         console.log(`[Shkeeper Webhook] Payment ${id} confirmed`);
         
         // TODO: Update order status in database
-        // await updateOrderPaymentStatus(orderId, orderStatus, {
-        //   paymentId: id,
-        //   provider: "shkeeper",
-        //   status: paymentStatus,
-        //   txHash,
-        //   amount,
-        //   crypto,
-        //   fiat,
-        //   wallet,
-        //   confirmedAt: confirmed_at,
-        // });
-        
         // TODO: Send confirmation email
-        // await sendOrderConfirmationEmail(orderId, {
-        //   txHash,
-        //   amount,
-        //   crypto,
-        // });
-        
         // TODO: Trigger fulfillment
-        // await triggerOrderFulfillment(orderId);
         
         break;
       
@@ -101,17 +89,7 @@ export async function POST(request: NextRequest) {
       case "new":
         paymentStatus = "pending";
         orderStatus = "pending_payment";
-        
         console.log(`[Shkeeper Webhook] Payment ${id} pending`);
-        
-        // TODO: Update order status
-        // await updateOrderPaymentStatus(orderId, orderStatus, {
-        //   paymentId: id,
-        //   provider: "shkeeper",
-        //   status: paymentStatus,
-        //   wallet,
-        // });
-        
         break;
       
       case "received":
@@ -119,38 +97,14 @@ export async function POST(request: NextRequest) {
       case "processing":
         paymentStatus = "processing";
         orderStatus = "processing_payment";
-        
         console.log(`[Shkeeper Webhook] Payment ${id} processing`);
-        
-        // TODO: Update order status
-        // await updateOrderPaymentStatus(orderId, orderStatus, {
-        //   paymentId: id,
-        //   provider: "shkeeper",
-        //   status: paymentStatus,
-        //   txHash,
-        //   amount,
-        //   crypto,
-        // });
-        
         break;
       
       case "expired":
       case "timeout":
         paymentStatus = "expired";
         orderStatus = "payment_expired";
-        
         console.log(`[Shkeeper Webhook] Payment ${id} expired`);
-        
-        // TODO: Update order status
-        // await updateOrderPaymentStatus(orderId, orderStatus, {
-        //   paymentId: id,
-        //   provider: "shkeeper",
-        //   status: paymentStatus,
-        // });
-        
-        // TODO: Send expiration notification
-        // await sendPaymentExpirationEmail(orderId);
-        
         break;
       
       case "failed":
@@ -158,16 +112,7 @@ export async function POST(request: NextRequest) {
       case "error":
         paymentStatus = "failed";
         orderStatus = "payment_failed";
-        
         console.log(`[Shkeeper Webhook] Payment ${id} failed`);
-        
-        // TODO: Update order status
-        // await updateOrderPaymentStatus(orderId, orderStatus, {
-        //   paymentId: id,
-        //   provider: "shkeeper",
-        //   status: paymentStatus,
-        // });
-        
         break;
       
       default:
