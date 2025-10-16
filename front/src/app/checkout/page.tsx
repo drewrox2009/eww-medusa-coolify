@@ -60,6 +60,7 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
       const data = await checkoutApi.createCheckoutSession(cartId);
+      console.log("Checkout data loaded:", data);
       setCheckoutData(data);
     } catch (error) {
       console.error("Failed to load checkout session:", error);
@@ -569,10 +570,10 @@ export default function CheckoutPage() {
                       <div key={item.id} className="flex items-center space-x-4">
                         <div className="flex-1">
                           <h4 className="text-sm font-medium text-gray-900">
-                            {item.title || item.product?.title || item.variant?.product?.title}
+                            {item.title || item.product_title || item.product?.title}
                           </h4>
                           <p className="text-sm text-gray-500">
-                            {item.variant?.title} × {item.quantity}
+                            {item.variant_title || item.variant?.title} × {item.quantity}
                           </p>
                         </div>
                         <div className="text-sm font-medium text-gray-900">
@@ -581,7 +582,18 @@ export default function CheckoutPage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500">Loading cart...</p>
+                    <div>
+                      <p className="text-sm text-gray-500">Loading cart...</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Cart ID: {cartId}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Data loaded: {checkoutData ? 'Yes' : 'No'}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Items count: {checkoutData?.cart?.items?.length || 0}
+                      </p>
+                    </div>
                   )}
 
                   <div className="border-t border-gray-200 pt-4">
