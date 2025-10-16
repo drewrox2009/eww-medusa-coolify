@@ -564,8 +564,8 @@ export default function CheckoutPage() {
                 </h3>
 
                 <div className="space-y-4">
-                  {cart?.items && cart.items.length > 0 ? (
-                    cart.items.map((item: any) => (
+                  {checkoutData?.cart?.items && checkoutData.cart.items.length > 0 ? (
+                    checkoutData.cart.items.map((item: any) => (
                       <div key={item.id} className="flex items-center space-x-4">
                         <div className="flex-1">
                           <h4 className="text-sm font-medium text-gray-900">
@@ -587,7 +587,7 @@ export default function CheckoutPage() {
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between text-base font-medium text-gray-900">
                       <span>Total</span>
-                      <span>{formatPrice(cart?.total || cart?.subtotal || 0)}</span>
+                      <span>{formatPrice(checkoutData?.cart?.total || checkoutData?.cart?.subtotal || 0)}</span>
                     </div>
                   </div>
                 </div>
