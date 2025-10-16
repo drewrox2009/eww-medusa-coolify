@@ -106,28 +106,28 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
 
-      // Create payment session with the selected provider
-      const paymentSession = await paymentManager.createPayment({
-        providerId: selectedPaymentMethod,
-        orderId: cartId,
-        amount: cart?.total ? cart.total / 100 : 0,
-        currency: cart?.currency_code || "USD",
-        description: `Order ${cartId}`,
-        customerEmail: user?.email,
-      });
-
       // For fake provider, auto-complete after delay
       if (selectedPaymentMethod === "fake") {
         // Wait a bit for the fake payment to complete
         await new Promise((resolve) => setTimeout(resolve, 3500));
-        
-        // Complete the order
+
+        // Complete the order directly
         await checkoutApi.completeOrder(cartId);
-        
+
         // Clear cart and redirect to confirmation
         clearCart();
-        router.push(`/checkout/confirmation?order=${cartId}&payment=${paymentSession.id}`);
+        router.push(`/checkout/confirmation?order=${cartId}&payment=fake`);
       } else {
+        // Create payment session with the selected provider
+        const paymentSession = await paymentManager.createPayment({
+          providerId: selectedPaymentMethod,
+          orderId: cartId,
+          amount: cart?.cart?.total ? cart.cart.total / 100 : 0,
+          currency: cart?.cart?.currency_code || "USD",
+          description: `Order ${cartId}`,
+          customerEmail: user?.email,
+        });
+
         // For real payment providers, redirect to payment URL
         if (paymentSession.paymentUrl) {
           window.location.href = paymentSession.paymentUrl;
@@ -558,7 +558,7 @@ export default function CheckoutPage() {
                       <button
                         type="submit"
                         disabled={loading || !selectedPaymentMethod}
-                        className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        className="inline-flex items-center px-6 py-3 border border-black text-base font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:bg-gray-400 disabled:cursor-not-allowed"
                       >
                         {loading ? "Processing..." : "Complete Order"}
                       </button>
