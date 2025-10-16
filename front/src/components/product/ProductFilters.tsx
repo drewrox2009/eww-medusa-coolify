@@ -24,11 +24,11 @@ type FilterSection = {
   items: { label: string; value: string }[];
 };
 
-const prescriptionOptions: FilterSection = {
-  title: "Prescription status",
+const availabilityOptions: FilterSection = {
+  title: "Availability status",
   items: [
-    { label: "Prescription required", value: "required" },
-    { label: "Over the counter", value: "otc" },
+    { label: "Restricted access", value: "restricted" },
+    { label: "General availability", value: "general" },
   ],
 };
 
@@ -36,23 +36,23 @@ export default function ProductFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [prescriptionFilters, setPrescriptionFilters] = useState<string[]>([]);
+  const [availabilityFilters, setAvailabilityFilters] = useState<string[]>([]);
 
   useEffect(() => {
     const urlCategories = searchParams.get("categories");
     if (urlCategories) {
       setSelectedCategories(urlCategories.split(","));
     }
-    const urlPrescription = searchParams.get("prescription");
-    if (urlPrescription) {
-      setPrescriptionFilters(urlPrescription.split(","));
+    const urlAvailability = searchParams.get("availability");
+    if (urlAvailability) {
+      setAvailabilityFilters(urlAvailability.split(","));
     }
   }, [searchParams]);
 
   const activeFilterCount =
-    selectedCategories.length + prescriptionFilters.length;
+    selectedCategories.length + availabilityFilters.length;
 
-  const updateQueryParams = (categories: string[], prescription: string[]) => {
+  const updateQueryParams = (categories: string[], availability: string[]) => {
     const params = new URLSearchParams(searchParams.toString());
     if (categories.length > 0) {
       params.set("categories", categories.join(","));
@@ -60,10 +60,10 @@ export default function ProductFilters() {
       params.delete("categories");
     }
 
-    if (prescription.length > 0) {
-      params.set("prescription", prescription.join(","));
+    if (availability.length > 0) {
+      params.set("availability", availability.join(","));
     } else {
-      params.delete("prescription");
+      params.delete("availability");
     }
 
     router.push(`/products?${params.toString()}`);
@@ -75,21 +75,21 @@ export default function ProductFilters() {
       : [...selectedCategories, category];
 
     setSelectedCategories(updated);
-    updateQueryParams(updated, prescriptionFilters);
+    updateQueryParams(updated, availabilityFilters);
   };
 
-  const togglePrescription = (value: string) => {
-    const updated = prescriptionFilters.includes(value)
-      ? prescriptionFilters.filter((item) => item !== value)
-      : [...prescriptionFilters, value];
+  const toggleAvailability = (value: string) => {
+    const updated = availabilityFilters.includes(value)
+      ? availabilityFilters.filter((item) => item !== value)
+      : [...availabilityFilters, value];
 
-    setPrescriptionFilters(updated);
+    setAvailabilityFilters(updated);
     updateQueryParams(selectedCategories, updated);
   };
 
   const clearFilters = () => {
     setSelectedCategories([]);
-    setPrescriptionFilters([]);
+    setAvailabilityFilters([]);
     router.push("/products");
   };
 
@@ -166,11 +166,11 @@ export default function ProductFilters() {
 
         <div className="space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            {prescriptionOptions.title}
+            {availabilityOptions.title}
           </h3>
           <div className="space-y-2">
-            {prescriptionOptions.items.map((option) => {
-              const isActive = prescriptionFilters.includes(option.value);
+            {availabilityOptions.items.map((option) => {
+              const isActive = availabilityFilters.includes(option.value);
               return (
                 <label
                   key={option.value}
@@ -179,7 +179,7 @@ export default function ProductFilters() {
                   <input
                     type="checkbox"
                     checked={isActive}
-                    onChange={() => togglePrescription(option.value)}
+                    onChange={() => toggleAvailability(option.value)}
                     className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
                   />
                   <span className="flex-1 text-left">{option.label}</span>
@@ -201,7 +201,7 @@ export default function ProductFilters() {
 
         <div className="rounded-3xl border border-primary-100 bg-primary-50/60 px-4 py-5 text-xs text-primary-700">
           Save favorite filters by creating an account for faster reordering and
-          clinical notes.
+          personalized recommendations.
         </div>
       </div>
     </aside>

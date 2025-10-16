@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CreditCard, Truck, MapPin, Check } from "lucide-react";
+import { ArrowLeft, CreditCard, Truck, MapPin, Check, Bitcoin, Wallet } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUserStore } from "@/lib/store/user-store";
 import * as checkoutApi from "@/lib/medusa/checkout";
+import { paymentManager } from "@/lib/payments/payment-manager";
+import type { PaymentProvider } from "@/lib/payments/types";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -18,6 +20,7 @@ export default function CheckoutPage() {
   );
   const [loading, setLoading] = useState(false);
   const [checkoutData, setCheckoutData] = useState<any>(null);
+  const [paymentProviders, setPaymentProviders] = useState<PaymentProvider[]>([]);
 
   const [shippingAddress, setShippingAddress] = useState({
     first_name: user?.first_name || "",
@@ -40,9 +43,15 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Load checkout session
+    // Load checkout session and payment providers
     loadCheckoutSession();
+    loadPaymentProviders();
   }, [cartId, itemCount, router]);
+
+  const loadPaymentProviders = () => {
+    const providers = paymentManager.getEnabledProviders();
+    setPaymentProviders(providers);
+  };
 
   const loadCheckoutSession = async () => {
     if (!cartId) return;
@@ -82,21 +91,42 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
 
-      // Create payment session
-      const paymentSession = await checkoutApi.createPaymentSession(
-        cartId,
-        selectedPaymentMethod
-      );
+      // Create payment session with the selected provider
+      const paymentSession = await paymentManager.createPayment({
+        providerId: selectedPaymentMethod,
+        orderId: cartId,
+        amount: cart?.total ? cart.total / 100 : 0,
+        currency: cart?.currency_code || "USD",
+        description: `Order ${cartId}`,
+        customerEmail: user?.email,
+      });
 
-      // Complete the order
-      const orderResult = await checkoutApi.completeOrder(cartId);
-
-      // Clear cart and redirect to confirmation
-      clearCart();
-      router.push(`/checkout/confirmation?order=${orderResult.orderId}`);
+      // For fake provider, auto-complete after delay
+      if (selectedPaymentMethod === "fake") {
+        // Wait a bit for the fake payment to complete
+        await new Promise((resolve) => setTimeout(resolve, 3500));
+        
+        // Complete the order
+        await checkoutApi.completeOrder(cartId);
+        
+        // Clear cart and redirect to confirmation
+        clearCart();
+        router.push(`/checkout/confirmation?order=${cartId}&payment=${paymentSession.id}`);
+      } else {
+        // For real payment providers, redirect to payment URL
+        if (paymentSession.paymentUrl) {
+          window.location.href = paymentSession.paymentUrl;
+        } else {
+          throw new Error("Payment URL not provided");
+        }
+      }
     } catch (error) {
       console.error("Payment processing failed:", error);
-      // In a real app, you'd show an error message
+      alert(
+        `Payment failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     } finally {
       setLoading(false);
     }
@@ -407,48 +437,95 @@ export default function CheckoutPage() {
                   </div>
 
                   <form onSubmit={handlePaymentSubmit} className="space-y-6">
-                    <div className="space-y-4">
-                      {paymentMethods.map((method: any) => (
-                        <div
-                          key={method.id}
-                          className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                            selectedPaymentMethod === method.id
-                              ? "border-primary-600 bg-primary-50"
-                              : "border-gray-200 hover:border-gray-300"
-                          }`}
-                          onClick={() => setSelectedPaymentMethod(method.id)}
-                        >
-                          <div className="flex items-center">
-                            <input
-                              type="radio"
-                              id={method.id}
-                              name="paymentMethod"
-                              value={method.id}
-                              checked={selectedPaymentMethod === method.id}
-                              onChange={(e) =>
-                                setSelectedPaymentMethod(e.target.value)
-                              }
-                              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-                            />
-                            <label
-                              htmlFor={method.id}
-                              className="ml-3 flex-1 cursor-pointer"
-                            >
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <h3 className="text-sm font-medium text-gray-900">
-                                    {method.name}
-                                  </h3>
-                                  <p className="text-sm text-gray-500">
-                                    {method.description}
-                                  </p>
+                    {paymentProviders.length === 0 ? (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500 mb-4">
+                          No payment providers are currently configured.
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          Please contact support or configure payment providers.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {paymentProviders.map((provider) => (
+                          <div
+                            key={provider.id}
+                            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                              selectedPaymentMethod === provider.id
+                                ? "border-primary-600 bg-primary-50 shadow-sm"
+                                : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                            }`}
+                            onClick={() => setSelectedPaymentMethod(provider.id)}
+                          >
+                            <div className="flex items-start">
+                              <input
+                                type="radio"
+                                id={provider.id}
+                                name="paymentMethod"
+                                value={provider.id}
+                                checked={selectedPaymentMethod === provider.id}
+                                onChange={(e) =>
+                                  setSelectedPaymentMethod(e.target.value)
+                                }
+                                className="h-4 w-4 mt-1 text-primary-600 focus:ring-primary-500 border-gray-300"
+                              />
+                              <label
+                                htmlFor={provider.id}
+                                className="ml-3 flex-1 cursor-pointer"
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <h3 className="text-sm font-medium text-gray-900">
+                                        {provider.name}
+                                      </h3>
+                                      {provider.testMode && (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                          Test
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                      {provider.description}
+                                    </p>
+                                    {provider.supportedCurrencies.length > 0 && (
+                                      <div className="flex flex-wrap gap-1 mt-2">
+                                        {provider.supportedCurrencies
+                                          .slice(0, 5)
+                                          .map((currency) => (
+                                            <span
+                                              key={currency}
+                                              className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700"
+                                            >
+                                              {currency}
+                                            </span>
+                                          ))}
+                                        {provider.supportedCurrencies.length >
+                                          5 && (
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                                            +
+                                            {provider.supportedCurrencies
+                                              .length - 5}{" "}
+                                            more
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                  {provider.id === "btcpay" && (
+                                    <Bitcoin className="h-6 w-6 text-orange-500 flex-shrink-0" />
+                                  )}
+                                  {provider.id === "shkeeper" && (
+                                    <Wallet className="h-6 w-6 text-blue-500 flex-shrink-0" />
+                                  )}
                                 </div>
-                              </div>
-                            </label>
+                              </label>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
 
                     <div className="flex justify-between">
                       <button

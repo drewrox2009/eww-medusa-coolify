@@ -256,7 +256,7 @@ function OrderConfirmationContent() {
                         Quality Check
                       </h4>
                       <p className="text-sm text-gray-500">
-                        All medications undergo quality control before shipping.
+                        All products undergo quality control before shipping.
                       </p>
                     </div>
                   </div>

@@ -54,10 +54,10 @@ export default function CartPage() {
                 Cart overview
               </span>
               <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
-                Review your medications
+                Review your order
               </h1>
               <p className="text-sm text-slate-600">
-                Manage treatment quantities, verify totals, and proceed to
+                Manage quantities, verify totals, and proceed to
                 secure checkout.
               </p>
             </div>
@@ -75,14 +75,14 @@ export default function CartPage() {
                 Your cart is currently empty
               </h2>
               <p className="max-w-md text-sm text-slate-500">
-                Browse our clinically vetted catalog to add medications and view
+                Browse our catalog to add products and view
                 personalized pricing.
               </p>
               <Link
                 href="/products"
                 className="inline-flex items-center justify-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-500"
               >
-                Browse medications
+                Browse products
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </div>

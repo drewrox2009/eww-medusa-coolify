@@ -156,8 +156,7 @@ export default function AccountPage() {
                     </div>
                   </div>
                   <p className="mt-4 text-xs text-slate-500">
-                    Licensed pharmacist review is enabled for all new
-                    prescriptions.
+                    Your account is verified and ready for secure transactions.
                   </p>
                 </div>
               </div>
@@ -177,7 +176,7 @@ export default function AccountPage() {
                     href="/products"
                     className="inline-flex items-center justify-center rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-primary-500"
                   >
-                    Browse medications
+                    Browse products
                   </Link>
                 </div>
                 <div className="mt-8 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-slate-200 bg-slate-50/60 px-6 py-12 text-center">

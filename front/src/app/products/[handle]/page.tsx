@@ -19,8 +19,8 @@ import { cn } from "@/lib/utils/cn";
 const reassurance = [
   {
     icon: ShieldCheck,
-    title: "Pharmacist verified",
-    description: "Licensed professionals validate authenticity and dosage.",
+    title: "Chemist verified",
+    description: "Licensed professionals validate authenticity.",
   },
   {
     icon: Lock,
@@ -40,7 +40,7 @@ const infoHighlights = [
     items: [
       "GMP-certified manufacturing partners",
       "Batch-level quality audits",
-      "Therapeutic equivalence to brand medications",
+      "Top Tier Quality Guaranteed",
     ],
   },
   {
@@ -139,7 +139,7 @@ export default async function ProductDetailPage({
             <div className="space-y-8">
               <div className="space-y-4">
                 <span className="badge-soft bg-primary-100 text-primary-800">
-                  {product.collection?.title ?? "Generic medication"}
+                  {product.collection?.title ?? "Research compound"}
                 </span>
                 <div className="space-y-3">
                   <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
@@ -180,15 +180,14 @@ export default async function ProductDetailPage({
                   <AddToCartButton product={product} />
                   <div className="flex flex-wrap items-center gap-3 text-[13px] text-slate-500">
                     <CircleCheck className="h-4 w-4 text-emerald-500" />
-                    Pharmacy license verification required before first
-                    shipment.
+                    Stock levels verified before cart order
                   </div>
                 </div>
               </div>
 
               <div className="card-surface space-y-6 rounded-[28px] border border-primary-100/60 bg-white/90 p-6">
                 <h2 className="text-lg font-semibold text-slate-900">
-                  Medication overview
+                  Product overview
                 </h2>
                 <div className="prose prose-slate max-w-none text-slate-600">
                   {product.description ? (
@@ -197,8 +196,7 @@ export default async function ProductDetailPage({
                     />
                   ) : (
                     <p>
-                      Detailed clinical notes will appear here once they are
-                      added for this medication.
+                      Detailed product information will appear here once added.
                     </p>
                   )}
                 </div>
@@ -229,11 +227,10 @@ export default async function ProductDetailPage({
               <div className="card-surface flex flex-col gap-4 rounded-[28px] border border-primary-100/60 bg-white/90 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
-                    Questions about this medication?
+                    Questions about this item?
                   </p>
                   <p className="text-xs text-slate-500">
-                    Our licensed pharmacists can review medical history and
-                    dosage suitability.
+                    Our knowledgable staff can answer any questions.
                   </p>
                 </div>
                 <Link

@@ -1,10 +1,10 @@
-// Pharmaceutical Product Types extending Medusa types
+// Product Types extending Medusa types
 
-export interface PharmaceuticalMetadata {
+export interface ProductMetadata {
   active_ingredient?: string;
-  prescription_required?: boolean;
+  access_restricted?: boolean;
   therapeutic_use?: string;
-  drug_class?: string;
+  compound_class?: string;
   dosage?: string;
   quantity?: number;
   unit?: string;
@@ -22,7 +22,7 @@ export interface ProductVariant {
     calculated_amount: number;
     currency_code: string;
   };
-  metadata?: PharmaceuticalMetadata;
+  metadata?: ProductMetadata;
   inventory_quantity?: number;
   manage_inventory?: boolean;
   allow_backorder?: boolean;
@@ -40,7 +40,7 @@ export interface Product {
   categories?: Array<{ id: string; name: string; handle: string }>;
   collection?: { id: string; title: string; handle: string };
   tags?: Array<{ id: string; value: string }>;
-  metadata?: PharmaceuticalMetadata;
+  metadata?: ProductMetadata;
   status: string;
 }
 
@@ -119,7 +119,7 @@ export interface ProductFilters {
     min: number;
     max: number;
   };
-  prescriptionRequired?: boolean;
+  accessRestricted?: boolean;
   inStock?: boolean;
   sortBy?: "price_asc" | "price_desc" | "name_asc" | "name_desc" | "popular";
   search?: string;

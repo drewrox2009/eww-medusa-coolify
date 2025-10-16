@@ -93,5 +93,19 @@ module.exports = defineConfig({
         ],
       },
     },
+    {
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          {
+            resolve: "./src/modules/payment-manual",
+            id: "manual",
+            options: {
+              name: "Manual Payment (Test/Development)",
+            },
+          },
+        ],
+      },
+    },
   ],
 });
