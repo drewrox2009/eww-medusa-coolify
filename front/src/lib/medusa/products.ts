@@ -11,6 +11,7 @@ export async function getProducts(params?: {
     offset: params?.offset || 0,
     category_id: params?.categoryId,
     q: params?.q,
+    expand: "variants.prices",
   });
 }
 
