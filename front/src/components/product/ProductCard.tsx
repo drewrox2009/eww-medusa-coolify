@@ -37,7 +37,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center justify-between pt-2">
           <div className="flex flex-col">
             <span className="text-xl font-bold text-black">
-              ${product.variants?.[0]?.prices?.[0]?.amount ? (product.variants[0].prices[0].amount / 100).toFixed(2) : 'N/A'}
+              {product.variants?.[0]?.prices?.[0]?.amount ? formatPrice(product.variants[0].prices[0].amount) : 'N/A'}
             </span>
           </div>
 
