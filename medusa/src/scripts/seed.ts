@@ -12,6 +12,7 @@ import {
   linkSalesChannelsToApiKeyWorkflow,
   linkSalesChannelsToStockLocationWorkflow,
   updateStoresWorkflow,
+  updateProductCategoriesWorkflow,
 } from "@medusajs/core-flows";
 import { CreateInventoryLevelInput, ExecArgs } from "@medusajs/types";
 import {
@@ -338,46 +339,53 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
   logger.info("Seeding product data...");
 
-  const { result: categoryResult } = await createProductCategoriesWorkflow(
+  // Create parent category first
+  const { result: parentCategoryResult } =
+    await createProductCategoriesWorkflow(container).run({
+      input: {
+        product_categories: [
+          {
+            name: "Research Chemicals",
+            is_active: true,
+          },
+        ],
+      },
+    });
+
+  const parentCategory = parentCategoryResult[0];
+
+  // Create subcategories
+  const { result: subcategoryResult } = await createProductCategoriesWorkflow(
     container
   ).run({
     input: {
       product_categories: [
         {
-          name: "Research Chemicals",
-          is_active: true,
-        },
-        {
           name: "Psychedelic Compounds",
           is_active: true,
-          parent_category: {
-            name: "Research Chemicals",
-          },
+          parent_category_id: parentCategory.id,
         },
         {
           name: "Serotonergic Agents",
           is_active: true,
-          parent_category: {
-            name: "Research Chemicals",
-          },
+          parent_category_id: parentCategory.id,
         },
         {
           name: "Neurological Research",
           is_active: true,
-          parent_category: {
-            name: "Research Chemicals",
-          },
+          parent_category_id: parentCategory.id,
         },
         {
           name: "CNS Modulators",
           is_active: true,
-          parent_category: {
-            name: "Research Chemicals",
-          },
+          parent_category_id: parentCategory.id,
         },
       ],
     },
   });
+
+  // Combine all categories
+  const categoryResult = [...parentCategoryResult, ...subcategoryResult];
 
   await createProductsWorkflow(container).run({
     input: {
