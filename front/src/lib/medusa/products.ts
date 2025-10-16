@@ -11,12 +11,11 @@ export async function getProducts(params?: {
     offset: params?.offset || 0,
     category_id: params?.categoryId,
     q: params?.q,
-    fields: "+variants.prices",
   });
 }
 
 export async function getProduct(handle: string) {
-  const response = await medusa.store.product.list({ handle, fields: "+variants.prices" });
+  const response = await medusa.store.product.list({ handle });
   return response.products?.[0] || null;
 }
 
