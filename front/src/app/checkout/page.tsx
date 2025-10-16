@@ -118,6 +118,14 @@ export default function CheckoutPage() {
         clearCart();
         router.push(`/checkout/confirmation?order=${cartId}&payment=fake`);
       } else {
+        // First create payment sessions in Medusa
+        try {
+          await checkoutApi.createPaymentSessions(cartId);
+        } catch (error) {
+          console.error("Failed to create payment session in Medusa:", error);
+          throw new Error("Failed to initialize payment session");
+        }
+
         // Create payment session with the selected provider
         const paymentSession = await paymentManager.createPayment({
           providerId: selectedPaymentMethod,

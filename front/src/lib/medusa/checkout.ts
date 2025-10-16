@@ -102,6 +102,15 @@ export async function createPaymentSession(cartId: string, providerId: string) {
   }
 }
 
+export async function createPaymentSessions(cartId: string) {
+  try {
+    return await medusa.store.cart.createPaymentSessions(cartId);
+  } catch (error) {
+    console.error("Create payment sessions error:", error);
+    throw error;
+  }
+}
+
 export async function completeOrder(cartId: string) {
   try {
     // Complete the order
