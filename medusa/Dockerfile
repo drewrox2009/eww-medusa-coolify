@@ -90,4 +90,4 @@ RUN if [ "$RUN_SEED" = "true" ]; then \
     echo "RUN_SEED is not set to 'true', skipping seed script."; \
   fi
 
-CMD ["yarn", "run", "start"]
+CMD ["yarn", "run", ,"seed", "start"]
