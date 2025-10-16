@@ -5,13 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Trash2, ArrowRight, ShoppingBag, ShieldCheck } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
-import { getCart } from "@/lib/medusa/cart";
+import { getCart, updateLineItem, removeLineItem } from "@/lib/medusa/cart";
 import { formatPrice } from "@/lib/utils/format";
 
 export default function CartPage() {
-  const { cartId, itemCount } = useCartStore();
+  const { cartId, itemCount, setItemCount } = useCartStore();
   const [cart, setCart] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function loadCart() {
@@ -30,6 +31,79 @@ export default function CartPage() {
   }, [cartId]);
 
   const items = useMemo(() => cart?.cart?.items ?? [], [cart?.cart?.items]);
+
+  const handleUpdateQuantity = async (lineItemId: string, newQuantity: number) => {
+    if (!cartId || newQuantity < 1) return;
+
+    setUpdatingItems((prev) => new Set(prev).add(lineItemId));
+
+    try {
+      await updateLineItem(cartId, lineItemId, newQuantity);
+      
+      // Reload cart to get updated data
+      const refreshedCart = await getCart(cartId);
+      setCart(refreshedCart);
+      
+      // Update item count in store
+      const totalItems = refreshedCart?.cart?.items?.reduce(
+        (sum: number, item: any) => sum + item.quantity,
+        0
+      ) ?? 0;
+      setItemCount(totalItems);
+    } catch (error) {
+      console.error("Failed to update quantity:", error);
+      alert("Failed to update quantity. Please try again.");
+    } finally {
+      setUpdatingItems((prev) => {
+        const next = new Set(prev);
+        next.delete(lineItemId);
+        return next;
+      });
+    }
+  };
+
+  const handleRemoveItem = async (lineItemId: string) => {
+    if (!cartId) return;
+
+    setUpdatingItems((prev) => new Set(prev).add(lineItemId));
+
+    try {
+      await removeLineItem(cartId, lineItemId);
+      
+      // Reload cart after removal
+      const refreshedCart = await getCart(cartId);
+      setCart(refreshedCart);
+      
+      // Update item count in store
+      const totalItems = refreshedCart?.cart?.items?.reduce(
+        (sum: number, item: any) => sum + item.quantity,
+        0
+      ) ?? 0;
+      setItemCount(totalItems);
+    } catch (error) {
+      console.error("Failed to remove item:", error);
+      alert("Failed to remove item. Please try again.");
+    } finally {
+      setUpdatingItems((prev) => {
+        const next = new Set(prev);
+        next.delete(lineItemId);
+        return next;
+      });
+    }
+  };
+
+  const getImageUrl = (thumbnail: string | null) => {
+    if (!thumbnail) return null;
+    
+    // If it's already a full URL, return it
+    if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) {
+      return thumbnail;
+    }
+    
+    // Otherwise, prepend the backend URL
+    const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000';
+    return `${backendUrl}${thumbnail}`;
+  };
 
   if (isLoading) {
     return (
@@ -92,12 +166,13 @@ export default function CartPage() {
                 {items.map((item: any) => (
                   <div key={item.id} className="card-surface flex gap-6 p-6">
                     <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-100">
-                      {item.variant?.product?.thumbnail ? (
+                      {getImageUrl(item.variant?.product?.thumbnail) ? (
                         <Image
-                          src={item.variant.product.thumbnail}
+                          src={getImageUrl(item.variant.product.thumbnail)!}
                           alt={item.title}
                           fill
                           className="object-contain p-3"
+                          unoptimized
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
@@ -125,10 +200,9 @@ export default function CartPage() {
                         <div className="inline-flex items-center gap-2">
                           <button
                             type="button"
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-primary-200 hover:text-primary-600"
-                            onClick={() => {
-                              // TODO: Implement quantity decrement
-                            }}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-primary-200 hover:text-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                            disabled={updatingItems.has(item.id) || item.quantity <= 1}
                             aria-label="Decrease quantity"
                           >
                             −
@@ -138,10 +212,9 @@ export default function CartPage() {
                           </span>
                           <button
                             type="button"
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-primary-200 hover:text-primary-600"
-                            onClick={() => {
-                              // TODO: Implement quantity increment
-                            }}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-primary-200 hover:text-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                            disabled={updatingItems.has(item.id)}
                             aria-label="Increase quantity"
                           >
                             +
@@ -150,10 +223,9 @@ export default function CartPage() {
 
                         <button
                           type="button"
-                          onClick={() => {
-                            // TODO: Implement remove item
-                          }}
-                          className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-500 transition hover:border-red-200 hover:text-red-600"
+                          onClick={() => handleRemoveItem(item.id)}
+                          disabled={updatingItems.has(item.id)}
+                          className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-500 transition hover:border-red-200 hover:text-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Remove
