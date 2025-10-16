@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CreditCard, Truck, MapPin, Check, Bitcoin, Wallet } from "lucide-react";
+import { ArrowLeft, ArrowRight, CreditCard, Truck, MapPin, Check, Bitcoin, Wallet } from "lucide-react";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useUserStore } from "@/lib/store/user-store";
 import * as checkoutApi from "@/lib/medusa/checkout";
 import { paymentManager } from "@/lib/payments/payment-manager";
 import type { PaymentProvider } from "@/lib/payments/types";
+import { formatPrice } from "@/lib/utils/format";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -418,9 +419,10 @@ export default function CheckoutPage() {
                       <button
                         type="submit"
                         disabled={loading}
-                        className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm"
                       >
                         {loading ? "Saving..." : "Continue to Payment"}
+                        <ArrowRight className="ml-2 h-4 w-4" />
                       </button>
                     </div>
                   </form>
@@ -560,14 +562,14 @@ export default function CheckoutPage() {
                     <div key={item.id} className="flex items-center space-x-4">
                       <div className="flex-1">
                         <h4 className="text-sm font-medium text-gray-900">
-                          {item.product?.title}
+                          {item.title || item.product?.title || item.variant?.product?.title}
                         </h4>
                         <p className="text-sm text-gray-500">
                           {item.variant?.title} × {item.quantity}
                         </p>
                       </div>
                       <div className="text-sm font-medium text-gray-900">
-                        ${(item.total / 100).toFixed(2)}
+                        {formatPrice(item.subtotal || item.unit_price * item.quantity)}
                       </div>
                     </div>
                   ))}
@@ -575,7 +577,7 @@ export default function CheckoutPage() {
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between text-base font-medium text-gray-900">
                       <span>Total</span>
-                      <span>${(cart?.total / 100 || 0).toFixed(2)}</span>
+                      <span>{formatPrice(cart?.total || cart?.subtotal || 0)}</span>
                     </div>
                   </div>
                 </div>
