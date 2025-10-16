@@ -12,7 +12,7 @@ export async function POST(
   req: MedusaRequest,
   res: MedusaResponse
 ) {
-  const { action, cartId } = req.body;
+  const { action, cartId } = req.body as { action: string; cartId: string };
 
   try {
     if (action === "complete_cart") {
@@ -25,7 +25,7 @@ export async function POST(
 
       res.json({
         success: true,
-        order: result.order || result,
+        order: (result as any).order || result,
       });
     } else {
       res.status(400).json({ error: "Invalid action" });
@@ -34,7 +34,7 @@ export async function POST(
     console.error("Cart completion error:", error);
     res.status(500).json({
       error: "Failed to complete cart",
-      details: error.message
+      details: (error as Error).message
     });
   }
 }
