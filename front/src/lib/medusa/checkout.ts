@@ -136,32 +136,6 @@ export async function completeOrder(cartId: string) {
   }
 }
 
-export async function completeCart(cartId: string) {
-  try {
-    // Use the backend API that runs the completeCartWorkflow
-    const response = await fetch(`${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/custom`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-publishable-api-key': process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY!,
-      },
-      body: JSON.stringify({
-        action: 'complete_cart',
-        cartId: cartId,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error("Complete cart error:", error);
-    throw error;
-  }
-}
 
 export async function getOrder(orderId: string) {
   try {

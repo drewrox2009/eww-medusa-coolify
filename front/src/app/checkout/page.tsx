@@ -112,11 +112,12 @@ export default function CheckoutPage() {
         await new Promise((resolve) => setTimeout(resolve, 3500));
 
         // Complete the order directly
-        await checkoutApi.completeOrder(cartId);
+        const result = await checkoutApi.completeOrder(cartId);
+        console.log("Order completed successfully:", result.orderId);
 
         // Clear cart and redirect to confirmation
         clearCart();
-        router.push(`/checkout/confirmation?order=${cartId}&payment=fake`);
+        router.push(`/checkout/confirmation?order=${result.orderId}&payment=fake`);
       } else {
         // First create payment sessions in Medusa
         try {
