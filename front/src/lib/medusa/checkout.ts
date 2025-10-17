@@ -76,9 +76,32 @@ export async function updateShippingAddress(
 
 export async function selectShippingOption(cartId: string, optionId: string) {
   try {
-    return await medusa.store.cart.update(cartId, {
-      shipping_method: optionId,
-    });
+    // Use HTTP endpoint to add/select shipping method (avoids SDK type mismatch)
+    const res = await fetch(
+      `${BACKEND_URL}/store/carts/${cartId}/shipping-methods`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": PUBLISHABLE_KEY,
+        },
+        credentials: "include",
+        // Support both Medusa API shapes
+        body: JSON.stringify({
+          option_id: optionId,
+          shipping_option_id: optionId,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(
+        body.message || `Failed to set shipping option (${res.status})`
+      );
+    }
+
+    return await res.json();
   } catch (error) {
     console.error("Select shipping option error:", error);
     throw error;
@@ -87,20 +110,40 @@ export async function selectShippingOption(cartId: string, optionId: string) {
 
 export async function createPaymentSession(cartId: string, providerId: string) {
   try {
-    // Create payment session with selected provider
-    const paymentSession = await medusa.store.cart.createPaymentSessions(
-      cartId
+    // Create payment sessions on backend (Medusa) via HTTP (SDK doesn't expose this method)
+    const res = await fetch(
+      `${BACKEND_URL}/store/carts/${cartId}/payment-sessions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": PUBLISHABLE_KEY,
+        },
+        credentials: "include",
+        body: JSON.stringify({}),
+      }
     );
 
-    // In a real implementation, you would configure the payment provider here
-    // For now, we'll return a mock payment session
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(
+        body.message || `Failed to create payment sessions (${res.status})`
+      );
+    }
+
+    const data = await res.json();
+
+    // Return a lightweight session descriptor to drive UI
+    const amount = data?.cart?.total ?? data?.cart?.subtotal ?? 0;
+    const currency = data?.cart?.currency_code ?? "USD";
+
     return {
       id: `payment_${cartId}_${Date.now()}`,
       provider_id: providerId,
       status: "pending",
       payment_url: `https://payment.example.com/${providerId}/${cartId}`,
-      amount: paymentSession.cart.total,
-      currency: paymentSession.cart.currency_code,
+      amount,
+      currency,
     };
   } catch (error) {
     console.error("Create payment session error:", error);
@@ -110,7 +153,28 @@ export async function createPaymentSession(cartId: string, providerId: string) {
 
 export async function createPaymentSessions(cartId: string) {
   try {
-    return await medusa.store.cart.createPaymentSessions(cartId);
+    // Use HTTP call because the JS SDK doesn't expose createPaymentSessions()
+    const res = await fetch(
+      `${BACKEND_URL}/store/carts/${cartId}/payment-sessions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": PUBLISHABLE_KEY,
+        },
+        credentials: "include",
+        body: JSON.stringify({}),
+      }
+    );
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(
+        body.message || `Failed to create payment sessions (${res.status})`
+      );
+    }
+
+    return await res.json();
   } catch (error) {
     console.error("Create payment sessions error:", error);
     throw error;
@@ -119,19 +183,41 @@ export async function createPaymentSessions(cartId: string) {
 
 export async function completeOrder(cartId: string) {
   try {
-    // Complete the order using the proper Medusa SDK method
-    const result = await medusa.store.cart.complete(cartId);
+    // Use HTTP call to avoid SDK surface differences across versions
+    const res = await fetch(`${BACKEND_URL}/store/carts/${cartId}/complete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-publishable-api-key": PUBLISHABLE_KEY,
+      },
+      credentials: "include",
+      body: JSON.stringify({}),
+    });
 
-    // Handle the response structure properly
-    if (result.type === "order" && result.order) {
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.message || `Failed to complete cart (${res.status})`);
+    }
+
+    const result = await res.json();
+
+    if (result?.type === "order" && result.order) {
       return {
         order: result.order,
         orderId: result.order.id,
         status: "completed",
         confirmationNumber: `ORD-${result.order.id.slice(-8).toUpperCase()}`,
       };
-    } else if (result.type === "cart" && result.cart) {
-      // Error occurred
+    } else if (result?.order) {
+      // Some Medusa responses may not include 'type'
+      return {
+        order: result.order,
+        orderId: result.order.id,
+        status: "completed",
+        confirmationNumber: `ORD-${result.order.id.slice(-8).toUpperCase()}`,
+      };
+    } else if (result?.type === "cart" && result.cart) {
+      // Error path
       throw new Error(result.error?.message || "Failed to complete order");
     } else {
       throw new Error("Unexpected response from order completion");
@@ -158,8 +244,8 @@ export async function getCustomerOrders(
   offset = 0
 ) {
   try {
+    // The Store API returns the authenticated customer's orders; explicit customer_id isn't required
     return await medusa.store.order.list({
-      customer_id: customerId,
       limit,
       offset,
     });
