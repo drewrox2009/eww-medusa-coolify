@@ -46,6 +46,9 @@ export default function PaymentPage() {
       // If payment is completed, complete the order and redirect to confirmation
       if (paymentStatus.status === "completed") {
         try {
+          // Ensure Medusa has a selected & authorized payment session (manual)
+          await checkoutApi.initManualPayment(paymentStatus.orderId);
+
           // Complete the cart using the proper Medusa workflow
           const result = await checkoutApi.completeOrder(paymentStatus.orderId);
           console.log("Order completed successfully:", result.orderId);

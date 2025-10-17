@@ -1,5 +1,11 @@
 import { medusa } from "./client";
 
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000";
+
+const PUBLISHABLE_KEY =
+  process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || "";
+
 export async function createCheckoutSession(cartId: string) {
   try {
     // Get cart details
@@ -159,6 +165,79 @@ export async function getCustomerOrders(
     });
   } catch (error) {
     console.error("Get customer orders error:", error);
+    throw error;
+  }
+}
+
+export async function initManualPayment(cartId: string) {
+  try {
+    // Ensure sessions exist
+    await createPaymentSessions(cartId);
+    // Select the manual provider as the active session
+    await selectManualPaymentSession(cartId);
+    // Authorize the manual payment session so the cart can be completed
+    await authorizeManualPayment(cartId);
+  } catch (error) {
+    console.error("Init manual payment error:", error);
+    throw error;
+  }
+}
+
+export async function selectManualPaymentSession(cartId: string) {
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/store/carts/${cartId}/payment-session`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": PUBLISHABLE_KEY,
+        },
+        credentials: "include",
+        body: JSON.stringify({ provider_id: "manual" }),
+      }
+    );
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(
+        body.message ||
+          `Failed to select manual payment session (${res.status})`
+      );
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Select manual payment session error:", error);
+    throw error;
+  }
+}
+
+export async function authorizeManualPayment(cartId: string) {
+  try {
+    const res = await fetch(
+      `${BACKEND_URL}/store/carts/${cartId}/payment-session/manual/authorize`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-publishable-api-key": PUBLISHABLE_KEY,
+        },
+        credentials: "include",
+        body: JSON.stringify({}),
+      }
+    );
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(
+        body.message || `Failed to authorize manual payment (${res.status})`
+      );
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Authorize manual payment error:", error);
     throw error;
   }
 }

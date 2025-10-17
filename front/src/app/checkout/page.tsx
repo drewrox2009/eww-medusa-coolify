@@ -111,6 +111,9 @@ export default function CheckoutPage() {
         // Wait a bit for the fake payment to complete
         await new Promise((resolve) => setTimeout(resolve, 3500));
 
+        // Ensure Medusa has a selected & authorized payment session (manual)
+        await checkoutApi.initManualPayment(cartId);
+
         // Complete the order directly
         const result = await checkoutApi.completeOrder(cartId);
         console.log("Order completed successfully:", result.orderId);
